@@ -1,0 +1,71 @@
+{
+    "symbols": {
+        "whitespace": [
+            " ",
+            "\t"
+        ],
+        "quote": [
+            "\"",
+            "`",
+            "'"
+        ],
+        "delimiter": [
+            ".",
+            ",",
+            "!",
+            "=",
+            "\\",
+            "+",
+            "-",
+            ":",
+            "*",
+            ">",
+            "<",
+            "/"
+        ],
+        "brace": [
+            "(",
+            ")",
+            "{",
+            "}",
+            "[",
+            "]"
+        ]
+    },
+    "types": [
+        {
+            "name": "string",
+            "trigger": "\""
+        },
+        {
+            "name": "string",
+            "trigger": "`",
+            "multiline": true
+        },
+        {
+            "name": "comment",
+            "trigger": "//"
+        },
+        {
+            "name": "comment",
+            "trigger": "/*",
+            "stopper": "*/",
+            "multiline": true
+        }
+    ],
+    "built-in": {
+        "keyword": [
+            "package",
+            "func",
+            "var",
+            "import",
+            "for",
+            "switch",
+            "type",
+            "return",
+            "if",
+            "else",
+            "case"
+        ]
+    }
+}
