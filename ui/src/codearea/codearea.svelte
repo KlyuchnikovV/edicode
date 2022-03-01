@@ -36,9 +36,13 @@
         keys.onKeyDown(event, cursor, elementLines);
     }
 
-    function onMouse() {
-        var offset = cursor.getCurrentCursorPosition();
-        cursor.onMouse(offset);
+    function onKeyPress(event) {
+        keys.onKeyPress(event, cursor, elementLines);
+    }
+
+    function onMouse(event) {
+        // var offset = cursor.getCurrentCursorPosition();
+        cursor.onMouse(event, elementLines);
     }
 
     afterUpdate(() => {
@@ -61,6 +65,7 @@
         contenteditable="true"
         on:keydown={onKeyDown}
         on:mouseup={onMouse}
+        on:keypress={onKeyPress}
     >
         {#each lines as line, index (line)}
             <Line

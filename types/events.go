@@ -10,8 +10,13 @@ type KeyboardEvent struct {
 	Shift  bool   `json:"shift"`
 	Meta   bool   `json:"meta"`
 
-	Line   int `json:"line"`
-	Offset int `json:"offset"`
+	StartLine   int `json:"startLine"`
+	StartOffset int `json:"startOffset"`
+	EndLine     int `json:"endLine"`
+	EndOffset   int `json:"endOffset"`
+
+	// Line   int `json:"line"`
+	// Offset int `json:"offset"`
 }
 
 func (e KeyboardEvent) String() string {

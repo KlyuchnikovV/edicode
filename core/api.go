@@ -103,6 +103,12 @@ func (core *Core) OnBufferChange(event plugin.Event) error {
 		return err
 	}
 
+	for i := range buffer.Lines {
+		for j := range buffer.Lines[i] {
+			buffer.Lines[i][j].Classes = nil
+		}
+	}
+
 	// TODO: highlight
 
 	// send data to backdrop

@@ -21,27 +21,49 @@ export default class Cursor {
                 break;
             case "ArrowLeft":
                 this.selection.left(event.shiftKey);
-                // console.log("left is disabled")
                 break;
             case "ArrowRight":
                 this.selection.right(event.shiftKey, false);
-                // console.log("right is disabled")
                 break;
         }
     }
 
-    onMouse(offset) {
-        console.log("mouse is disabled")
-        // for (var i = 0; i < this.lines.length; i++) {
-        //     var lineLen = this.selection.lenOfLine(i);
-        //     if (lineLen >= offset) {
-        //         this.line = i + 1
-        //         this.offset = offset
-        //         break;
-        //     }
-        //     offset -= lineLen + 1
-        // }
-        console.log(window.getSelection())
+    onMouse(event, lines) {
+        var selection = window.getSelection();
+        var range = selection.getRangeAt(0);
+        var startLine = 0, startNode = 0, endLine = 0, endNode = 0;
+        var startOffset = 0, endOffset = 0;
+        console.log(range)
+        for (var i = 0; i < lines.length; i++) {
+            var len = 0
+            for (var j = 0; j < lines[i].children.length; j++) {
+                if (range.startContainer.parentNode.isEqualNode(lines[i].children[j])) {
+                    startLine = i+1;
+                    startNode = j;
+                    startOffset = len + range.startOffset;
+                }
+                if (range.endContainer.parentNode.isEqualNode(lines[i].children[j])) {
+                    endLine = i+1;
+                    endNode = j;
+                    endOffset = len + range.endOffset;
+                }
+                if (startLine !== 0 && endLine !== 0) {
+                    break;
+                }
+                len += lines[i].children[j].textContent.length
+            }
+        }
+
+        this.selection.start = {
+            line: startLine,
+            offset: startOffset,
+        }
+        this.selection.end = {
+            line: endLine,
+            offset: endOffset,
+        }
+
+        console.log(this.selection)
     }
 
     // TODO: selection left-right expansion
@@ -115,13 +137,13 @@ export default class Cursor {
     rangeTill(start, startOffset, end, endOffset) {
         let range = document.createRange()
 
-        console.log("1")
-        console.log(`node is '${start.children[0].textContent}'`)
+        // console.log("1")
+        // console.log(`node is '${start.children[0].textContent}'`)
 
-        console.log("2")
+        // console.log("2")
         var node = start.children[0]
         for (var i = 1; i < start.children.length && startOffset > node.textContent.length; i++) {
-            console.log(`node is '${node.textContent}'`)
+            // console.log(`node is '${node.textContent}'`)
             startOffset -= node.textContent.length
             node = start.children[i]
         }
@@ -133,17 +155,17 @@ export default class Cursor {
             node = node.firstChild
         }
 
-        console.log("3")
-        console.log(node)
-        console.log(`offset ${startOffset}`)
+        // console.log("3")
+        // console.log(node)
+        // console.log(`offset ${startOffset}`)
         range.setStart(node, startOffset);
 
-        console.log("4")
+        // console.log("4")
 
-        console.log("5")
+        // console.log("5")
         var node = end.children[0]
         for (var i = 1; i < end.children.length && endOffset > node.textContent.length; i++) {
-            console.log(node)
+            // console.log(node)
             endOffset -= node.textContent.length
             node = end.children[i]
         }
@@ -155,11 +177,11 @@ export default class Cursor {
             node = node.firstChild
         }
 
-        console.log("6")
-        console.log(node)
-        console.log(`offset ${endOffset}`)
+        // console.log("6")
+        // console.log(node)
+        // console.log(`offset ${endOffset}`)
         range.setEnd(node, endOffset);
-        console.log("7")
+        // console.log("7")
         return range;
     }
 }

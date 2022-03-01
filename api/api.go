@@ -48,4 +48,3 @@ func (api *Api) HandleKeyboardEvent(data map[string]interface{}) error {
 func (api *Api) GetBufferNames() []string {
 	return api.core.GetBufferNames()
 }
-

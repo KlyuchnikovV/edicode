@@ -1,38 +1,3 @@
-// // let code = "function add(a, b) {\n\treeturn a + b\n}";
-// // let codeElement;
-
-// // let selections = [];
-// let currentSelection = null;
-
-// export function updateSelection(event) {
-//     currentSelection = {
-//         start: event.currentTarget.selectionStart,
-//         end: event.currentTarget.selectionEnd,
-//     };
-// }
-
-// // function recordSelection() {
-// //     if (!currentSelection) return;
-
-// //     selections = [...selections, currentSelection];
-// // }
-
-// export function playbackSelection(codeElement) {
-//     // selections.forEach((selection) => {
-//     // setTimeout(() => {
-//     // currentSelection = selection;
-//     selection = currentSelection
-//     codeElement.focus();
-//     codeElement.setSelectionRange(selection.start, selection.end);
-//     //}, index * 1000);
-//     // });
-//     // clear at the end
-//     // setTimeout(() => {
-//     //     window.getSelection().empty();
-//     //     currentSelection = null;
-//     // }, selections.length * 1000);
-// }
-
 export default class Selection {
     constructor() {
         this.start = {
@@ -155,5 +120,12 @@ export default class Selection {
             lineLen += element.value.length;
         });
         return lineLen
+    }
+
+    collapse() {
+        this.end = {
+            line: this.start.line,
+            offset: this.start.offset,
+        }
     }
 }
