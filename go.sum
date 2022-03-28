@@ -1,5 +1,7 @@
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/KlyuchnikovV/edigode v0.0.0-20211209121658-42980a9c6cd7/go.mod h1:sY7k4/mJWJ1mvkLp2ZWm4ux4kuQgL/wJovMBrf9EthU=
+github.com/KlyuchnikovV/edigode v0.0.0-20220119154317-f170501aeb16 h1:9fOY8pCT0b1FwY5oYZgJsoZ/DD9h88WaJ9ZWa+e1OgM=
+github.com/KlyuchnikovV/edigode v0.0.0-20220119154317-f170501aeb16/go.mod h1:EHrTuTZ026p4VtLIT6mCt8TNFii3iYVg7f0b7+zGYOk=
 github.com/KlyuchnikovV/stack v0.0.0-20210427103552-f6f21f8b4227 h1:6cfT3pA4+zyIrLtqHKpi7STdm3xplcLahoke8zdTAzc=
 github.com/KlyuchnikovV/stack v0.0.0-20210427103552-f6f21f8b4227/go.mod h1:/lVt2XeS0PAXniX9UqL19jDky4u1FlouhWxBHrivP6o=
 github.com/Masterminds/semver v1.4.2/go.mod h1:MB6lktGJrhw8PrUyiEoblNEGEQ+RzHPF078ddwwvV3Y=

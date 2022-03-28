@@ -5,8 +5,8 @@ import (
 	"log"
 	"plugin"
 
-	"github.com/KlyuchnikovV/edigode/core/context"
-	"github.com/KlyuchnikovV/edigode/types"
+	"github.com/KlyuchnikovV/edicode/core/context"
+	"github.com/KlyuchnikovV/edicode/types"
 	"github.com/mitchellh/mapstructure"
 	"github.com/wailsapp/wails"
 )

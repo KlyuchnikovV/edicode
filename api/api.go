@@ -3,8 +3,8 @@ package api
 import (
 	"log"
 
-	"github.com/KlyuchnikovV/edigode/core"
-	"github.com/KlyuchnikovV/edigode/types"
+	"github.com/KlyuchnikovV/edicode/core"
+	"github.com/KlyuchnikovV/edicode/types"
 	"github.com/mitchellh/mapstructure"
 	"github.com/wailsapp/wails"
 )

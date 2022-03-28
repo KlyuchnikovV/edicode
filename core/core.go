@@ -7,8 +7,8 @@ import (
 	"os"
 
 	"github.com/KlyuchnikovV/buffer"
-	"github.com/KlyuchnikovV/edigode/core/context"
-	"github.com/KlyuchnikovV/edigode/core/plugin"
+	"github.com/KlyuchnikovV/edicode/core/context"
+	"github.com/KlyuchnikovV/edicode/core/plugin"
 	"github.com/mitchellh/mapstructure"
 	"github.com/wailsapp/wails"
 )

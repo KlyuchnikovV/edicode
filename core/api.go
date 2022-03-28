@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/KlyuchnikovV/buffer"
-	"github.com/KlyuchnikovV/edigode/core/plugin"
-	"github.com/KlyuchnikovV/edigode/core/syntax"
-	"github.com/KlyuchnikovV/edigode/types"
+	"github.com/KlyuchnikovV/edicode/core/plugin"
+	"github.com/KlyuchnikovV/edicode/core/syntax"
+	"github.com/KlyuchnikovV/edicode/types"
 )
 
 func (core *Core) GetBuffer(name string) (*types.BufferData, error) {

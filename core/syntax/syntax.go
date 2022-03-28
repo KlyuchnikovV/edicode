@@ -3,7 +3,7 @@ package syntax
 import (
 	"regexp"
 
-	"github.com/KlyuchnikovV/edigode/types"
+	"github.com/KlyuchnikovV/edicode/types"
 )
 
 type Parser struct {

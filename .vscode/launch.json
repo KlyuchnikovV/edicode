@@ -20,7 +20,7 @@
             "type": "go",
             "request": "launch",
             "mode": "exec",
-            "program": "${workspaceFolder}/build/edigode",
+            "program": "${workspaceFolder}/build/edicode",
             "env": {
                 "EDIGODE_FRONT_ONLY": "TRUE"
             },

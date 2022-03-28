@@ -3,8 +3,8 @@ package main
 import (
 	_ "embed"
 
-	"github.com/KlyuchnikovV/edigode/api"
-	"github.com/KlyuchnikovV/edigode/core"
+	"github.com/KlyuchnikovV/edicode/api"
+	"github.com/KlyuchnikovV/edicode/core"
 	"github.com/wailsapp/wails"
 	"golang.org/x/net/context"
 )
@@ -22,7 +22,7 @@ func main() {
 	app := wails.CreateApp(&wails.AppConfig{
 		Width:  1000,
 		Height: 700,
-		Title:  "edigode",
+		Title:  "edicode",
 		JS:     js,
 		CSS:    css,
 		HTML:   html,
