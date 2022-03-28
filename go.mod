@@ -1,4 +1,4 @@
-module github.com/KlyuchnikovV/edigode
+module github.com/KlyuchnikovV/edicode
 
 go 1.16
 
