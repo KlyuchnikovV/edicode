@@ -8,12 +8,13 @@ import (
 
 type Parser struct {
 	isWhitespace *regexp.Regexp
+	isSymbol     *regexp.Regexp
 }
 
 const (
 	// Undefined    = "undefined"
-	// Delimiter    = "delimiter"
-	Symbols = "symbols"
+	Delimiter = "delimiter"
+	Symbols   = "symbols"
 	// OpeningBrace = "opening-brace"
 	// ClosingBrace = "closing-brace"
 	// Quote        = "quote"
@@ -29,11 +30,12 @@ const (
 func New() Parser {
 	return Parser{
 		isWhitespace: regexp.MustCompile(`\s+`),
+		isSymbol:     regexp.MustCompile(`\w+`),
 	}
 }
 
-func (p Parser) Tokenize(text string) ([]types.Line, error) {
-	var tokens, err = p.tokenize(text)
+func (p Parser) TokenizeLines(text string) ([]types.Line, error) {
+	var tokens, err = p.Tokenize(text)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +53,7 @@ func (p Parser) Tokenize(text string) ([]types.Line, error) {
 	return result, nil
 }
 
-func (p Parser) tokenize(text string) ([]types.Token, error) {
+func (p Parser) Tokenize(text string) ([]types.Token, error) {
 	var (
 		token = types.Token{
 			Classes: []types.Class{types.NewClass(Symbols)},
@@ -102,5 +104,9 @@ func (p Parser) defineClass(char rune) types.Class {
 		return types.NewClass(Whitespace)
 	}
 
-	return types.NewClass(Symbols)
+	if p.isSymbol.Match([]byte{byte(char)}) {
+		return types.NewClass(Symbols)
+	}
+
+	return types.NewClass(Delimiter)
 }

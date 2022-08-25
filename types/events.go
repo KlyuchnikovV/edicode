@@ -16,7 +16,7 @@ type KeyboardEvent struct {
 	EndOffset   int `json:"endOffset"`
 
 	// Line   int `json:"line"`
-	// Offset int `json:"offset"`
+	Offset int `json:"offset"`
 }
 
 func (e KeyboardEvent) String() string {

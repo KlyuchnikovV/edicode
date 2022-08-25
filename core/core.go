@@ -6,9 +6,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/KlyuchnikovV/buffer"
 	"github.com/KlyuchnikovV/edicode/core/context"
 	"github.com/KlyuchnikovV/edicode/core/plugin"
+	buffer "github.com/KlyuchnikovV/simple_buffer"
 	"github.com/mitchellh/mapstructure"
 	"github.com/wailsapp/wails"
 )
@@ -44,7 +44,7 @@ func New(ctx ctx.Context, paths ...string) (*Core, error) {
 			return nil, err
 		}
 
-		core.buffers[path] = buffer.New(ctx, path, bytes...)
+		core.buffers[path] = buffer.NewFromBytes(bytes...)
 	}
 
 	// p, err := plugin.New(
@@ -68,9 +68,9 @@ func (core *Core) Init() {
 func (core *Core) Bind(app *wails.App) {
 	app.Bind(&core.Context)
 
-	for _, buf := range core.Buffers() {
-		app.Bind(buf)
-	}
+	// for _, buf := range core.Buffers() {
+	// 	app.Bind(buf)
+	// }
 
 	for _, pl := range core.plugins {
 		app.Bind(&pl)
@@ -78,21 +78,21 @@ func (core *Core) Bind(app *wails.App) {
 }
 
 func (core *Core) Start() error {
-	for _, buf := range core.buffers {
-		if err := buf.Start(); err != nil {
-			return nil
-		}
-	}
+	// for _, buf := range core.buffers {
+	// 	if err := buf.Start(); err != nil {
+	// 		return nil
+	// 	}
+	// }
 
 	return nil
 }
 
 func (core *Core) Cancel() error {
-	for _, buf := range core.buffers {
-		if err := buf.Cancel(); err != nil {
-			return nil
-		}
-	}
+	// for _, buf := range core.buffers {
+	// 	if err := buf.Cancel(); err != nil {
+	// 		return nil
+	// 	}
+	// }
 
 	return nil
 }

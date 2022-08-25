@@ -48,3 +48,23 @@ func (api *Api) HandleKeyboardEvent(data map[string]interface{}) error {
 func (api *Api) GetBufferNames() []string {
 	return api.core.GetBufferNames()
 }
+
+func (api *Api) LengthOfLine(request types.GetLineLengthRequest) (int, error) {
+	return api.core.LengthOfLine(request)
+}
+
+func (api *Api) LengthOfBuffer(buffer string) (int, error) {
+	return api.core.LengthOfBuffer(buffer)
+}
+
+func (api *Api) GetCursor(buffer string) (*types.GetCursorResponse, error) {
+	return api.core.GetCursor(buffer)
+}
+
+func (api *Api) SetCursor(data map[string]interface{}) (*types.GetCursorResponse, error) {
+	var event types.CursorMovedEvent
+	if err := mapstructure.Decode(data, &event); err != nil {
+		return nil, err
+	}
+	return api.core.SetCursor(event)
+}

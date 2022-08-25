@@ -6,6 +6,7 @@
     export let buffer = "";
     export let line = 0;
     export let node;
+    export let lineCursor;
 
     // onMount(async () => {
     //     window.wails.Events.On("line_changed", (event) => {
@@ -17,9 +18,19 @@
 
     //     cursor = new Cursor(file, element);
     // });
+
+    function onMouse() {
+        lineCursor(line)
+    }
+
 </script>
 
-<div bind:this={node} class="line" id={`${buffer}-${line + 1}`}>
+<div
+    bind:this={node}
+    class="line"
+    id={`${buffer}-${line + 1}`}
+    on:mouseup={onMouse}
+>
     {#if tokens.length > 0}
         {#each tokens as token, index (token)}
             <Token
@@ -43,7 +54,8 @@
 
 <style>
     .line {
-        width: fit-content;
+        /* width: fit-content; */
+        width: inherit;
         user-select: none;
         -webkit-user-select: none;
     }

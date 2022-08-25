@@ -4,31 +4,43 @@
     import Line from "./line.svelte";
     import Cursor from "./cursor";
     import Keys from "./keys";
-    import { afterUpdate, onMount } from "svelte";
+    import { afterUpdate, beforeUpdate, onMount } from "svelte";
 
     let lines = [];
     let element, cursor, keys;
     let elementLines = [];
 
     onMount(async () => {
-        cursor = new Cursor(file, element);
         keys = new Keys(file, cursor);
+        cursor = new Cursor(file, element);
 
         var bufferInit = async () => {
             let buf = await window.backend.Api.GetBuffer(file);
             console.log(`buffer loaded ${file}`);
             lines = buf.lines;
-            cursor.selection.lines = buf.lines;
         };
 
         bufferInit();
 
-        window.wails.Events.On("highlight_changed", (event) => {
-            if (event.data.buffer === file) {
-                console.log(`highlight changed ${event.data.buffer}`);
-                lines = event.data.lines;
-                cursor.selection.lines = event.data.lines;
-            }
+        window.wails.Events.On(`highlight_changed_${file}`, (event) => {
+            console.log(`highlight changed ${file}`);
+
+            // console.log(event.data.lines);
+            lines = event.data.lines;
+
+            window.backend.Api.GetCursor(file).then((offset, err) => {
+                if (err !== undefined) {
+                    console.log(err);
+                    return;
+                }
+
+                console.log(`cursor is ${offset.cursor}`);
+                cursor.setCurrentCursorPosition(elementLines, offset);
+            });
+        });
+
+        window.wails.Events.On(`cursor_moved_${file}`, (event) => {
+            cursor.setCurrentCursorPosition(elementLines, event.data);
         });
     });
 
@@ -37,23 +49,11 @@
     }
 
     function onKeyPress(event) {
-        keys.onKeyPress(event, cursor, elementLines);
+        // keys.onKeyPress(event, cursor, elementLines);
     }
-
-    function onMouse(event) {
-        // var offset = cursor.getCurrentCursorPosition();
-        cursor.onMouse(event, elementLines);
-    }
-
-    afterUpdate(() => {
-        if (cursor !== undefined) {
-            console.log(`after update`);
-            cursor.setCurrentCursorPosition(elementLines);
-        }
-    });
 </script>
 
-<div class={"codearea"}>
+<div class="codearea">
     <div class={"gutter"}>
         {#each lines as _, index (index)}
             <code class={"gutter-line"}>{index + 1}</code>
@@ -64,7 +64,6 @@
         class="container"
         contenteditable="true"
         on:keydown={onKeyDown}
-        on:mouseup={onMouse}
         on:keypress={onKeyPress}
     >
         {#each lines as line, index (line)}
@@ -73,6 +72,9 @@
                 buffer={file}
                 line={index}
                 tokens={line}
+                lineCursor={function (line) {
+                    cursor.onMouseByLine(line, elementLines);
+                }}
             />
         {/each}
     </div>

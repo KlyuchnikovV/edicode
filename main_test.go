@@ -1,28 +1,27 @@
 package main
 
 import (
-	ctx "context"
 	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/KlyuchnikovV/buffer"
+	buffer "github.com/KlyuchnikovV/simple_buffer"
 )
 
 func TestMain2(t *testing.T) {
-	buf := *buffer.New(ctx.Background(), "")
+	buf := *buffer.New()
 
 	buf.Insert(1, 0, 'e')
 
-	buf.Tree.String()
+	fmt.Printf(buf.String())
 }
 
 func TestNewFromString(t *testing.T) {
 	var str = "package main\n\nimport \"fmt\"\n\nHello, world!"
-	buf := *buffer.New(ctx.Background(), "", []byte(str)...)
+	buf := *buffer.New([]rune(str)...)
 
-	assert.Equal(t, str, buf.Tree.String())
+	assert.Equal(t, str, buf.String())
 
-	fmt.Printf("result: %s", buf.Tree.String())
+	fmt.Printf("result: %s", buf.String())
 }

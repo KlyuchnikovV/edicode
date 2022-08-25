@@ -56,6 +56,15 @@
 		max-height: 93%;
 	}
 
+	:global(.svelte-tabs li.svelte-tabs__tab) {
+		color: white;
+		font: 15px/24px "Fira Code", sans-serif;
+	}
+
+	:global(.svelte-tabs li.svelte-tabs__selected) {
+		color: #4f81e5;
+	}
+
 	@media (min-width: 640px) {
 		main {
 			max-width: none;

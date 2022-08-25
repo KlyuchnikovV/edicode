@@ -33,3 +33,22 @@ func (t Token) GetClasses() []string {
 	}
 	return classes
 }
+
+type GetLineLengthRequest struct {
+	Buffer string `json:"buffer"`
+	Line   int    `json:"line"`
+}
+
+type GetCursorResponse struct {
+	Buffer string `json:"buffer"`
+	Line   int    `json:"line"`
+	Offset int    `json:"offset"`
+	Cursor int    `json:"cursor"`
+}
+
+type CursorMovedEvent struct {
+	Buffer string `json:"buffer"`
+	Line   int    `json:"line"`
+	Offset int    `json:"offset"`
+	Cursor int    `json:"cursor"`
+}

@@ -5,13 +5,12 @@ import (
 	"log"
 	"os"
 	"sort"
-	"strings"
 	"time"
 
-	"github.com/KlyuchnikovV/buffer"
 	"github.com/KlyuchnikovV/edicode/core/plugin"
 	"github.com/KlyuchnikovV/edicode/core/syntax"
 	"github.com/KlyuchnikovV/edicode/types"
+	buffer "github.com/KlyuchnikovV/simple_buffer"
 )
 
 func (core *Core) GetBuffer(name string) (*types.BufferData, error) {
@@ -20,12 +19,7 @@ func (core *Core) GetBuffer(name string) (*types.BufferData, error) {
 		return nil, fmt.Errorf("buffer '%s' not found", name)
 	}
 
-	lines, err := buf.GetLines()
-	if err != nil {
-		return nil, err
-	}
-
-	result, err := syntax.New().Tokenize(strings.Join(lines, "\n"))
+	result, err := syntax.New().TokenizeLines(buf.String())
 	if err != nil {
 		return nil, err
 	}
@@ -46,26 +40,52 @@ func (core *Core) HandleKeyboardEvent(event types.KeyboardEvent) error {
 	switch {
 	case event.Key == "Backspace":
 		log.Printf("HANDLE: backspace event is %#v", event)
-		buf.KeyboardEvents() <- event
+		if err := buf.Delete(1); err != nil {
+			panic(err)
+		}
+		// buf.KeyboardEvents() <- event
 	case event.Key == "ArrowLeft":
-		buf.KeyboardEvents() <- event
+		buf.CursorLeft()
+		// buf.KeyboardEvents() <- event
 	case event.Key == "ArrowRight":
-		buf.KeyboardEvents() <- event
+		buf.CursorRight()
+		// buf.KeyboardEvents() <- event
 	case event.Key == "ArrowUp":
-		buf.KeyboardEvents() <- event
+		buf.CursorUp()
+		// buf.KeyboardEvents() <- event
 	case event.Key == "ArrowDown":
-		buf.KeyboardEvents() <- event
+		buf.CursorDown()
+		// buf.KeyboardEvents() <- event
 	case event.Key == "Enter":
-		buf.KeyboardEvents() <- event
+		// buf.KeyboardEvents() <- event
+		if err := buf.Append('\n'); err != nil {
+			panic(err)
+		}
 	case event.Key == "Escape":
 		log.Printf("EXITING")
 		os.Exit(0)
 	case len(event.Key) == 1:
 		log.Printf("HANDLE: event is %#v", event)
-		buf.KeyboardEvents() <- event
+		if err := buf.Append(rune(event.Key[0])); err != nil {
+			panic(err)
+		}
+		// buf.KeyboardEvents() <- event
 	case event.Key == "Tab":
-		buf.KeyboardEvents() <- event
+		if err := buf.Append('\t'); err != nil {
+			panic(err)
+		}
+		// buf.KeyboardEvents() <- event
 	}
+
+	line, offset, cursor := buf.GetCursor()
+	core.Emit("cursor_moved", event.Buffer, types.GetCursorResponse{
+		Buffer: event.Buffer,
+		Line:   line,
+		Offset: offset,
+		Cursor: cursor,
+	})
+
+	core.Emit("buffer", "changed", event.Buffer)
 
 	return nil
 }
@@ -112,7 +132,59 @@ func (core *Core) OnBufferChange(event plugin.Event) error {
 	// TODO: highlight
 
 	// send data to backdrop
-	core.EmitTimed("highlight", "changed", buffer.Timestamp, buffer)
+	core.EmitTimed("highlight_changed", buffer.Buffer, buffer.Timestamp, buffer)
 
 	return nil
+}
+
+func (core *Core) LengthOfLine(request types.GetLineLengthRequest) (int, error) {
+	buf, ok := core.buffers[request.Buffer]
+	if !ok {
+		return -1, fmt.Errorf("buf '%s' not found", request.Buffer)
+	}
+
+	return buf.LengthOfLine(request.Line)
+}
+
+func (core *Core) LengthOfBuffer(buffer string) (int, error) {
+	buf, ok := core.buffers[buffer]
+	if !ok {
+		return -1, fmt.Errorf("buf '%s' not found", buffer)
+	}
+
+	return len(buf.String()), nil
+}
+
+func (core *Core) GetCursor(buffer string) (*types.GetCursorResponse, error) {
+	buf, ok := core.buffers[buffer]
+	if !ok {
+		return nil, fmt.Errorf("buf '%s' not found", buffer)
+	}
+
+	line, offset, cursor := buf.GetCursor()
+
+	return &types.GetCursorResponse{
+		Line:   line,
+		Offset: offset,
+		Cursor: cursor,
+	}, nil
+}
+
+func (core *Core) SetCursor(event types.CursorMovedEvent) (*types.GetCursorResponse, error) {
+	buf, ok := core.buffers[event.Buffer]
+	if !ok {
+		return nil, fmt.Errorf("buf '%s' not found", event.Buffer)
+	}
+
+	buf.SetCursor(event.Line, event.Offset)
+
+	line, offset, cursor := buf.GetCursor()
+	core.Emit("cursor_moved", event.Buffer, types.GetCursorResponse{
+		Buffer: event.Buffer,
+		Line:   line,
+		Offset: offset,
+		Cursor: cursor,
+	})
+
+	return core.GetCursor(event.Buffer)
 }
