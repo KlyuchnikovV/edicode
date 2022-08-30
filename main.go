@@ -1,47 +1,44 @@
 package main
 
 import (
+	"embed"
 	_ "embed"
 
 	"github.com/KlyuchnikovV/edicode/api"
 	"github.com/KlyuchnikovV/edicode/core"
-	"github.com/wailsapp/wails"
+	"github.com/wailsapp/wails/v2"
+	"github.com/wailsapp/wails/v2/pkg/options"
 	"golang.org/x/net/context"
 )
 
-//go:embed ui/public/build/bundle.js
-var js string
-
-//go:embed ui/public/index.html
-var html string
-
-//go:embed ui/public/build/bundle.css
-var css string
+//go:embed frontend/dist
+var assets embed.FS
 
 func main() {
-	app := wails.CreateApp(&wails.AppConfig{
-		Width:  1000,
-		Height: 700,
-		Title:  "edicode",
-		JS:     js,
-		CSS:    css,
-		HTML:   html,
-		Colour: "#FFFFFF",
-	})
+	var api = api.New()
 
-	c, err := core.New(context.Background(), "main.go", "main_test.go")
-	if err != nil {
+	if err := wails.Run(&options.App{
+		Width:            1000,
+		Height:           700,
+		Title:            "edicode",
+		Assets:           assets,
+		BackgroundColour: options.NewRGB(255, 255, 255),
+		OnStartup:        onStartup(api),
+		Bind: []interface{}{
+			api,
+		},
+	}); err != nil {
 		panic(err)
 	}
+}
 
-	a := api.New(c)
-	a.Bind(app)
+func onStartup(api *api.Api) func(ctx context.Context) {
+	return func(ctx context.Context) {
+		c, err := core.New(ctx, "main.go")
+		if err != nil {
+			panic(err)
+		}
 
-	if err := c.Start(); err != nil {
-		panic(err)
-	}
-
-	if err := app.Run(); err != nil {
-		panic(err)
+		api.Bind(c)
 	}
 }

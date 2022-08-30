@@ -1,0 +1,15 @@
+{
+    "name": "edicode",
+    "author": {
+        "name": "Klyuchnikov Valeriy",
+        "email": "valeriy.v.klyuchnikov@gmail.com"
+    },
+    "version": "0.1.0",
+    "outputfilename": "edicode",
+    "frontend:install": "npm install",
+    "frontend:build": "npm run build",
+    "frontend:dev:watcher": "npm run dev",
+    "frontend:dev:serverUrl": "auto",
+    "reloaddirs": ".",
+    "wailsjsdir": "./frontend"
+}

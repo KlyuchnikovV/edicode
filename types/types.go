@@ -1,5 +1,7 @@
 package types
 
+import "github.com/KlyuchnikovV/simple_buffer"
+
 type Core interface {
 	GetBuffer(string) (*BufferData, error)
 
@@ -39,16 +41,14 @@ type GetLineLengthRequest struct {
 	Line   int    `json:"line"`
 }
 
-type GetCursorResponse struct {
-	Buffer string `json:"buffer"`
-	Line   int    `json:"line"`
-	Offset int    `json:"offset"`
-	Cursor int    `json:"cursor"`
+type GetCaretResponse struct {
+	Buffer string              `json:"buffer"`
+	Start  simple_buffer.Caret `json:"start"`
+	End    simple_buffer.Caret `json:"end"`
 }
 
-type CursorMovedEvent struct {
+type CaretMovedEvent struct {
 	Buffer string `json:"buffer"`
-	Line   int    `json:"line"`
-	Offset int    `json:"offset"`
-	Cursor int    `json:"cursor"`
+	Start  simple_buffer.Caret `json:"start"`
+	End    simple_buffer.Caret `json:"end"`
 }

@@ -5,23 +5,20 @@ import (
 
 	"github.com/KlyuchnikovV/edicode/core"
 	"github.com/KlyuchnikovV/edicode/types"
+	"github.com/KlyuchnikovV/simple_buffer"
 	"github.com/mitchellh/mapstructure"
-	"github.com/wailsapp/wails"
 )
 
 type Api struct {
 	core *core.Core
 }
 
-func New(c *core.Core) *Api {
-	return &Api{
-		core: c,
-	}
+func New() *Api {
+	return &Api{}
 }
 
-func (api *Api) Bind(app *wails.App) {
-	app.Bind(api)
-	api.core.Bind(app)
+func (api *Api) Bind(core *core.Core) {
+	api.core = core
 }
 
 func (api *Api) GetBuffer(name string) (types.BufferData, error) {
@@ -34,7 +31,7 @@ func (api *Api) GetBuffer(name string) (types.BufferData, error) {
 
 func (api *Api) HandleKeyboardEvent(data map[string]interface{}) error {
 	log.Printf("API: %#v", data)
-	var event types.KeyboardEvent
+	var event simple_buffer.KeyboardEvent
 	if err := mapstructure.Decode(data, &event); err != nil {
 		return err
 	}
@@ -57,12 +54,12 @@ func (api *Api) LengthOfBuffer(buffer string) (int, error) {
 	return api.core.LengthOfBuffer(buffer)
 }
 
-func (api *Api) GetCursor(buffer string) (*types.GetCursorResponse, error) {
+func (api *Api) GetCursor(buffer string) (*types.GetCaretResponse, error) {
 	return api.core.GetCursor(buffer)
 }
 
-func (api *Api) SetCursor(data map[string]interface{}) (*types.GetCursorResponse, error) {
-	var event types.CursorMovedEvent
+func (api *Api) SetCursor(data map[string]interface{}) (*types.GetCaretResponse, error) {
+	var event types.CaretMovedEvent
 	if err := mapstructure.Decode(data, &event); err != nil {
 		return nil, err
 	}

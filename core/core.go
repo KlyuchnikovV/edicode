@@ -1,16 +1,16 @@
 package core
 
 import (
-	ctx "context"
 	"io/ioutil"
 	"log"
 	"os"
+
+	goContext "context"
 
 	"github.com/KlyuchnikovV/edicode/core/context"
 	"github.com/KlyuchnikovV/edicode/core/plugin"
 	buffer "github.com/KlyuchnikovV/simple_buffer"
 	"github.com/mitchellh/mapstructure"
-	"github.com/wailsapp/wails"
 )
 
 /* TODO:
@@ -28,10 +28,11 @@ type Core struct {
 	plugins []plugin.Plugin
 }
 
-func New(ctx ctx.Context, paths ...string) (*Core, error) {
+func New(ctx goContext.Context, paths ...string) (*Core, error) {
 	var core = Core{
 		buffers: make(map[string]*buffer.Buffer, len(paths)),
 	}
+
 	core.Context = *context.New(ctx, core.Init)
 
 	for _, path := range paths {
@@ -44,8 +45,12 @@ func New(ctx ctx.Context, paths ...string) (*Core, error) {
 			return nil, err
 		}
 
-		core.buffers[path] = buffer.NewFromBytes(bytes...)
+		core.buffers[path] = buffer.NewFromBytes(core.Context, path, bytes...)
 	}
+
+	// for _, pl := range core.plugins {
+	// 	app.Bind(&pl)
+	// }
 
 	// p, err := plugin.New(
 	// 	&core,
@@ -58,24 +63,24 @@ func New(ctx ctx.Context, paths ...string) (*Core, error) {
 
 	// core.plugins = []plugin.Plugin{}
 
+	core.On("buffer", "changed", core.on("buffer_changed", core.OnBufferChange))
 	return &core, nil
 }
 
 func (core *Core) Init() {
-	core.On("buffer", "changed", core.on("buffer_changed", core.OnBufferChange))
 }
 
-func (core *Core) Bind(app *wails.App) {
-	app.Bind(&core.Context)
+// func (core *Core) Bind(app *wails.App) {
+// 	app.Bind(&core.Context)
 
-	// for _, buf := range core.Buffers() {
-	// 	app.Bind(buf)
-	// }
+// 	// for _, buf := range core.Buffers() {
+// 	// 	app.Bind(buf)
+// 	// }
 
-	for _, pl := range core.plugins {
-		app.Bind(&pl)
-	}
-}
+// 	for _, pl := range core.plugins {
+// 		app.Bind(&pl)
+// 	}
+// }
 
 func (core *Core) Start() error {
 	// for _, buf := range core.buffers {

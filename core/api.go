@@ -3,7 +3,6 @@ package core
 import (
 	"fmt"
 	"log"
-	"os"
 	"sort"
 	"time"
 
@@ -31,61 +30,53 @@ func (core *Core) GetBuffer(name string) (*types.BufferData, error) {
 	}, nil
 }
 
-func (core *Core) HandleKeyboardEvent(event types.KeyboardEvent) error {
-	buf, ok := core.buffers[event.Buffer]
+func (core *Core) HandleKeyboardEvent(event buffer.KeyboardEvent) error {
+	buffer, ok := core.buffers[event.Buffer]
 	if !ok {
 		return fmt.Errorf("buf '%s' not found", event.Buffer)
 	}
 
-	switch {
-	case event.Key == "Backspace":
-		log.Printf("HANDLE: backspace event is %#v", event)
-		if err := buf.Delete(1); err != nil {
-			panic(err)
-		}
-		// buf.KeyboardEvents() <- event
-	case event.Key == "ArrowLeft":
-		buf.CursorLeft()
-		// buf.KeyboardEvents() <- event
-	case event.Key == "ArrowRight":
-		buf.CursorRight()
-		// buf.KeyboardEvents() <- event
-	case event.Key == "ArrowUp":
-		buf.CursorUp()
-		// buf.KeyboardEvents() <- event
-	case event.Key == "ArrowDown":
-		buf.CursorDown()
-		// buf.KeyboardEvents() <- event
-	case event.Key == "Enter":
-		// buf.KeyboardEvents() <- event
-		if err := buf.Append('\n'); err != nil {
-			panic(err)
-		}
-	case event.Key == "Escape":
-		log.Printf("EXITING")
-		os.Exit(0)
-	case len(event.Key) == 1:
-		log.Printf("HANDLE: event is %#v", event)
-		if err := buf.Append(rune(event.Key[0])); err != nil {
-			panic(err)
-		}
-		// buf.KeyboardEvents() <- event
-	case event.Key == "Tab":
-		if err := buf.Append('\t'); err != nil {
-			panic(err)
-		}
-		// buf.KeyboardEvents() <- event
-	}
+	buffer.KeyEvents <- event
 
-	line, offset, cursor := buf.GetCursor()
-	core.Emit("cursor_moved", event.Buffer, types.GetCursorResponse{
-		Buffer: event.Buffer,
-		Line:   line,
-		Offset: offset,
-		Cursor: cursor,
-	})
-
-	core.Emit("buffer", "changed", event.Buffer)
+	// switch {
+	// case event.Key == "Backspace":
+	// 	log.Printf("HANDLE: backspace event is %#v", event)
+	// 	if err := buf.Delete(1); err != nil {
+	// 		panic(err)
+	// 	}
+	// 	// buf.KeyboardEvents() <- event
+	// case event.Key == "ArrowLeft":
+	// 	buf.CursorLeft(event.Shift)
+	// 	// buf.KeyboardEvents() <- event
+	// case event.Key == "ArrowRight":
+	// 	buf.CursorRight(event.Shift)
+	// 	// buf.KeyboardEvents() <- event
+	// case event.Key == "ArrowUp":
+	// 	buf.CursorUp(event.Shift)
+	// 	// buf.KeyboardEvents() <- event
+	// case event.Key == "ArrowDown":
+	// 	buf.CursorDown(event.Shift)
+	// 	// buf.KeyboardEvents() <- event
+	// case event.Key == "Enter":
+	// 	// buf.KeyboardEvents() <- event
+	// 	if err := buf.Append('\n'); err != nil {
+	// 		panic(err)
+	// 	}
+	// case event.Key == "Escape":
+	// 	log.Printf("EXITING")
+	// 	os.Exit(0)
+	// case len(event.Key) == 1:
+	// 	log.Printf("HANDLE: event is %#v", event)
+	// 	if err := buf.Append(rune(event.Key[0])); err != nil {
+	// 		panic(err)
+	// 	}
+	// 	// buf.KeyboardEvents() <- event
+	// case event.Key == "Tab":
+	// 	if err := buf.Append('\t'); err != nil {
+	// 		panic(err)
+	// 	}
+	// 	// buf.KeyboardEvents() <- event
+	// }
 
 	return nil
 }
@@ -155,35 +146,32 @@ func (core *Core) LengthOfBuffer(buffer string) (int, error) {
 	return len(buf.String()), nil
 }
 
-func (core *Core) GetCursor(buffer string) (*types.GetCursorResponse, error) {
+func (core *Core) GetCursor(buffer string) (*types.GetCaretResponse, error) {
 	buf, ok := core.buffers[buffer]
 	if !ok {
 		return nil, fmt.Errorf("buf '%s' not found", buffer)
 	}
 
-	line, offset, cursor := buf.GetCursor()
-
-	return &types.GetCursorResponse{
-		Line:   line,
-		Offset: offset,
-		Cursor: cursor,
+	start, end := buf.GetSelection()
+	return &types.GetCaretResponse{
+		Start: start,
+		End:   end,
 	}, nil
 }
 
-func (core *Core) SetCursor(event types.CursorMovedEvent) (*types.GetCursorResponse, error) {
+func (core *Core) SetCursor(event types.CaretMovedEvent) (*types.GetCaretResponse, error) {
 	buf, ok := core.buffers[event.Buffer]
 	if !ok {
 		return nil, fmt.Errorf("buf '%s' not found", event.Buffer)
 	}
 
-	buf.SetCursor(event.Line, event.Offset)
+	buf.SetSelection(event.Start, event.End)
 
-	line, offset, cursor := buf.GetCursor()
-	core.Emit("cursor_moved", event.Buffer, types.GetCursorResponse{
+	start, end := buf.GetSelection()
+	core.Emit("cursor_moved", event.Buffer, types.GetCaretResponse{
 		Buffer: event.Buffer,
-		Line:   line,
-		Offset: offset,
-		Cursor: cursor,
+		Start:  start,
+		End:    end,
 	})
 
 	return core.GetCursor(event.Buffer)

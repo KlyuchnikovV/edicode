@@ -1,3 +1,5 @@
+import { HandleKeyboardEvent } from "../../wailsjs/go/api/Api.js";
+
 export default class Keys {
     constructor(file) {
         this.file = file
@@ -17,19 +19,16 @@ export default class Keys {
             // endOffset: cursor.selection.end.offset,
         }
 
-        if (event.metaKey) {
-            return
-        }
-
         if (event.key.length === 1 && !event.ctrlKey && !event.altKey) {
             event.preventDefault();
-            window.backend.Api.HandleKeyboardEvent(keyboardEvent).then((err) => {
-                if (err !== undefined) {
+
+            HandleKeyboardEvent(keyboardEvent).then((err) => {
+                if (err) {
                     console.log(err);
                 }
             });
             // cursor.selection.right(event.shiftKey, true);
-            // cursor.setCurrentCursorPosition(elementLines);
+            // cursor.setCurrentCursorPosition(elementLines);B
             return
         }
 
@@ -41,8 +40,10 @@ export default class Keys {
             case "ArrowDown":
             case "ArrowLeft":
             case "ArrowRight":
-                window.backend.Api.HandleKeyboardEvent(keyboardEvent).then((err) => {
-                    if (err !== undefined) {
+
+                console.log("key")
+                HandleKeyboardEvent(keyboardEvent).then((err) => {
+                    if (err) {
                         console.log(err);
                     }
                 });
@@ -51,8 +52,8 @@ export default class Keys {
                 // return;
                 break;
             case "Backspace":
-                window.backend.Api.HandleKeyboardEvent(keyboardEvent).then((err) => {
-                    if (err !== undefined) {
+                HandleKeyboardEvent(keyboardEvent).then((err) => {
+                    if (err) {
                         console.log(err);
                     }
                 });
@@ -62,8 +63,8 @@ export default class Keys {
                 // }
                 break;
             case "Enter":
-                window.backend.Api.HandleKeyboardEvent(keyboardEvent).then((err) => {
-                    if (err !== undefined) {
+                HandleKeyboardEvent(keyboardEvent).then((err) => {
+                    if (err) {
                         console.log(err);
                     }
                 });
@@ -71,8 +72,8 @@ export default class Keys {
                 // cursor.offset = 0;
                 break;
             case "Tab":
-                window.backend.Api.HandleKeyboardEvent(keyboardEvent).then((err) => {
-                    if (err !== undefined) {
+                HandleKeyboardEvent(keyboardEvent).then((err) => {
+                    if (err) {
                         console.log(err);
                     }
                 });
@@ -90,41 +91,41 @@ export default class Keys {
         // cursor.setCurrentCursorPosition(elementLines);
     }
 
-    // onKeyPress(event, cursor, lines) {
-    //     console.log(`keypress ${event}`)
-    //     var keyboardEvent = {
-    //         buffer: this.file,
-    //         key: event.key,
-    //         alt: event.altKey,
-    //         ctrl: event.ctrlKey,
-    //         shift: event.shiftKey,
-    //         meta: event.metaKey,
-    //         // startLine: cursor.selection.start.line,
-    //         // endLine: cursor.selection.end.line,
-    //         // startOffset: cursor.selection.start.offset,
-    //         // endOffset: cursor.selection.end.offset,
-    //     }
+    onKeyPress(event, cursor, lines) {
+        console.log(`keypress ${event}`)
+        var keyboardEvent = {
+            buffer: this.file,
+            key: event.key,
+            alt: event.altKey,
+            ctrl: event.ctrlKey,
+            shift: event.shiftKey,
+            meta: event.metaKey,
+            // startLine: cursor.selection.start.line,
+            // endLine: cursor.selection.end.line,
+            // startOffset: cursor.selection.start.offset,
+            // endOffset: cursor.selection.end.offset,
+        }
 
-    //     if (!event.metaKey) {
-    //         return
-    //     }
+        if (!event.metaKey) {
+            return
+        }
 
-    //     switch (event.key) {
-    //         case 'v':
-    //             window.backend.Api.HandleKeyboardEvent(keyboardEvent).then((err) => {
-    //                 if (err !== undefined) {
-    //                     console.log(err);
-    //                 }
-    //             });
-    //             break;
-    //         case 'c':
-    //             window.backend.Api.HandleKeyboardEvent(keyboardEvent).then((err) => {
-    //                 if (err !== undefined) {
-    //                     console.log(err);
-    //                 }
-    //             });
-    //             break;
-    //     }
-    //     event.preventDefault()
-    // }
+        switch (event.key) {
+            case 'v':
+                HandleKeyboardEvent(keyboardEvent).then((err) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                });
+                break;
+            case 'c':
+                HandleKeyboardEvent(keyboardEvent).then((err) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                });
+                break;
+        }
+        event.preventDefault()
+    }
 }

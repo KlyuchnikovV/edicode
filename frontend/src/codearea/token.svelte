@@ -4,18 +4,18 @@
     export let buffer = "";
     export let line = 0;
     export let token = 0;
-    // export let cursor;
-
-    function onMouse(event) {
-        // cursor(event, line - 1, token);
-    }
+    export let sendSelection;
 </script>
 
 <code
-    id={`${buffer}-${line}:${token}`}
-    class={classes}
+    id={`${buffer}-${line+1}:${token}`}
+    class={classes.join(" ")}
     contenteditable="true"
-    on:mouseup={onMouse}
+    on:mouseup={(event) => {
+        console.log(`triggered by token (${line+1}-${token})`)
+        event.stopPropagation();
+        sendSelection(line, token);
+    }}
 >
     {text}
 </code>
@@ -26,25 +26,22 @@
         tab-size: 4;
         outline: none;
         display: inline-block;
-        user-select: auto;
-        -webkit-user-select: auto;
         min-width: 3px;
         height: 100%;
         caret-color: whitesmoke;
+
+        user-select: text;
+        -webkit-user-select: text;
     }
 
-    code::selection {
-        /* background: rgba(81, 92, 126, 0.25);
-        color: rgba(81, 92, 126, 0.27); */
-        background: cyan;
+    code::selection,
+    code::-webkit-selection {
+        color: yellowgreen;
+        outline: blue 2px;
     }
 
     .symbols {
         color: whitesmoke;
-    }
-
-    .whitespace {
-        /* background: red; */
     }
 
     .delimiter {

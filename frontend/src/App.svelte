@@ -1,11 +1,12 @@
 <script>
 	import Codearea from "./codearea/codearea.svelte";
 	import { Tabs, Tab, TabList, TabPanel } from "svelte-tabs";
+	import { GetBufferNames } from "../wailsjs/go/api/Api.js";
 
 	let getBufferNamesPromise = getBufferNames();
 
 	async function getBufferNames() {
-		return await window.backend.Api.GetBufferNames();
+		return await GetBufferNames();
 	}
 </script>
 
@@ -23,7 +24,7 @@
 		{#await getBufferNamesPromise then bufferNames}
 			{#each bufferNames as buffer (buffer)}
 				<TabPanel>
-					<Codearea file={buffer} language={"go"} />
+					<Codearea file={buffer} />
 				</TabPanel>
 			{/each}
 		{:catch err}
