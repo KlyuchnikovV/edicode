@@ -1,6 +1,7 @@
 export namespace types {
 	
 	export class Token {
+	    offset: number;
 	    value: string;
 	    classes: string[];
 	
@@ -10,6 +11,7 @@ export namespace types {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.offset = source["offset"];
 	        this.value = source["value"];
 	        this.classes = source["classes"];
 	    }
@@ -52,8 +54,8 @@ export namespace types {
 	}
 	export class GetCaretResponse {
 	    buffer: string;
-	    start: simple_buffer.Caret;
-	    end: simple_buffer.Caret;
+	    start: selection.Caret;
+	    end: selection.Caret;
 	
 	    static createFrom(source: any = {}) {
 	        return new GetCaretResponse(source);
@@ -62,8 +64,8 @@ export namespace types {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.buffer = source["buffer"];
-	        this.start = this.convertValues(source["start"], simple_buffer.Caret);
-	        this.end = this.convertValues(source["end"], simple_buffer.Caret);
+	        this.start = this.convertValues(source["start"], selection.Caret);
+	        this.end = this.convertValues(source["end"], selection.Caret);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -101,7 +103,7 @@ export namespace types {
 
 }
 
-export namespace simple_buffer {
+export namespace selection {
 	
 	export class Caret {
 	    line: number;

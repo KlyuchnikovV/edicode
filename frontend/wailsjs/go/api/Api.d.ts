@@ -5,6 +5,8 @@ import {types} from '../models';
 
 export function Bind(arg1:core.Core):void;
 
+export function GetActionsList(arg1:string):Promise<Array<string>>;
+
 export function GetBuffer(arg1:string):Promise<types.BufferData>;
 
 export function GetBufferNames():Promise<Array<string>>;
@@ -16,5 +18,11 @@ export function HandleKeyboardEvent(arg1:{[key: string]: any}):Promise<Error>;
 export function LengthOfBuffer(arg1:string):Promise<number>;
 
 export function LengthOfLine(arg1:types.GetLineLengthRequest):Promise<number>;
+
+export function MakeAction(arg1:{[key: string]: any}):Promise<Error>;
+
+export function MouseDown(arg1:{[key: string]: any}):Promise<Error>;
+
+export function MouseUp(arg1:{[key: string]: any}):Promise<Error>;
 
 export function SetCursor(arg1:{[key: string]: any}):Promise<types.GetCaretResponse>;

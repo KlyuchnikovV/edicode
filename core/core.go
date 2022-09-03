@@ -7,6 +7,7 @@ import (
 
 	goContext "context"
 
+	"github.com/KlyuchnikovV/edicode/core/actions"
 	"github.com/KlyuchnikovV/edicode/core/context"
 	"github.com/KlyuchnikovV/edicode/core/plugin"
 	buffer "github.com/KlyuchnikovV/simple_buffer"
@@ -26,6 +27,7 @@ type Core struct {
 	buffers map[string]*buffer.Buffer
 
 	plugins []plugin.Plugin
+	actions []actions.Action
 }
 
 func New(ctx goContext.Context, paths ...string) (*Core, error) {
@@ -48,6 +50,11 @@ func New(ctx goContext.Context, paths ...string) (*Core, error) {
 		core.buffers[path] = buffer.NewFromBytes(core.Context, path, bytes...)
 	}
 
+	core.actions = []actions.Action{
+		actions.NewSaveFile(core.SaveBuffer),
+		&actions.OpenFile{},
+	}
+
 	// for _, pl := range core.plugins {
 	// 	app.Bind(&pl)
 	// }
@@ -68,38 +75,6 @@ func New(ctx goContext.Context, paths ...string) (*Core, error) {
 }
 
 func (core *Core) Init() {
-}
-
-// func (core *Core) Bind(app *wails.App) {
-// 	app.Bind(&core.Context)
-
-// 	// for _, buf := range core.Buffers() {
-// 	// 	app.Bind(buf)
-// 	// }
-
-// 	for _, pl := range core.plugins {
-// 		app.Bind(&pl)
-// 	}
-// }
-
-func (core *Core) Start() error {
-	// for _, buf := range core.buffers {
-	// 	if err := buf.Start(); err != nil {
-	// 		return nil
-	// 	}
-	// }
-
-	return nil
-}
-
-func (core *Core) Cancel() error {
-	// for _, buf := range core.buffers {
-	// 	if err := buf.Cancel(); err != nil {
-	// 		return nil
-	// 	}
-	// }
-
-	return nil
 }
 
 func (core *Core) on(eventName string, handler plugin.On) func(...interface{}) {

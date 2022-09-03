@@ -2,8 +2,10 @@
 	import Codearea from "./codearea/codearea.svelte";
 	import { Tabs, Tab, TabList, TabPanel } from "svelte-tabs";
 	import { GetBufferNames } from "../wailsjs/go/api/Api.js";
+	import Sidepanel from "./sidepanel/sidepanel.svelte";
 
 	let getBufferNamesPromise = getBufferNames();
+
 
 	async function getBufferNames() {
 		return await GetBufferNames();
@@ -31,30 +33,40 @@
 			{console.log(err)}
 		{/await}
 	</Tabs>
+	<Sidepanel />
 </main>
 
 <style>
 	main {
 		text-align: center;
-		max-width: 240px;
+		/* max-width: 240px; */
 		margin: 0 auto;
-		max-height: 97vh;
+		/* max-height: 97vh; */
 		overflow: hidden;
+
+		display: -webkit-flex;
 		display: flex;
+		min-width: 120px;
 	}
 
 	:global(.svelte-tabs) {
-		max-height: 100%;
+		height: 100%;
 		width: 100%;
+		-webkit-flex: 2;
+		-ms-flex: 2;
+		flex: 2;
 	}
 
 	:global(.svelte-tabs ul) {
 		text-align: left;
 		max-height: 100%;
+		flex: 0 1 auto;
+		border-bottom: 1px #CCCCCC solid;
 	}
 	:global(.svelte-tabs > div) {
 		overflow: auto;
 		max-height: 93%;
+		flex: 1 1 auto;
 	}
 
 	:global(.svelte-tabs li.svelte-tabs__tab) {
@@ -66,11 +78,11 @@
 		color: #4f81e5;
 	}
 
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
+	/* @media { */
+	main {
+		max-width: none;
 	}
+	/* } */
 
 	:global(body) {
 		/* TODO: to file */

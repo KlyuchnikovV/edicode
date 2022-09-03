@@ -65,3 +65,31 @@ func (api *Api) SetCursor(data map[string]interface{}) (*types.GetCaretResponse,
 	}
 	return api.core.SetCursor(event)
 }
+
+func (api *Api) MouseDown(data map[string]interface{}) error {
+	var event types.MouseEvent
+	if err := mapstructure.Decode(data, &event); err != nil {
+		return err
+	}
+	return api.core.MouseDown(event)
+}
+
+func (api *Api) MouseUp(data map[string]interface{}) error {
+	var event types.MouseEvent
+	if err := mapstructure.Decode(data, &event); err != nil {
+		return err
+	}
+	return api.core.MouseUp(event)
+}
+
+func (api *Api) GetActionsList(filterBy string) []string {
+	return api.core.GetActionsList(filterBy)
+}
+
+func (api *Api) MakeAction(data map[string]interface{}) error {
+	var action types.ActionParams
+	if err := mapstructure.Decode(data, &action); err != nil {
+		return err
+	}
+	return api.core.MakeAction(action.Action, action.Param)
+}

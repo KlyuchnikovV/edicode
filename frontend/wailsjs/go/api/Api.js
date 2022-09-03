@@ -6,6 +6,10 @@ export function Bind(arg1) {
   return window['go']['api']['Api']['Bind'](arg1);
 }
 
+export function GetActionsList(arg1) {
+  return window['go']['api']['Api']['GetActionsList'](arg1);
+}
+
 export function GetBuffer(arg1) {
   return window['go']['api']['Api']['GetBuffer'](arg1);
 }
@@ -28,6 +32,18 @@ export function LengthOfBuffer(arg1) {
 
 export function LengthOfLine(arg1) {
   return window['go']['api']['Api']['LengthOfLine'](arg1);
+}
+
+export function MakeAction(arg1) {
+  return window['go']['api']['Api']['MakeAction'](arg1);
+}
+
+export function MouseDown(arg1) {
+  return window['go']['api']['Api']['MouseDown'](arg1);
+}
+
+export function MouseUp(arg1) {
+  return window['go']['api']['Api']['MouseUp'](arg1);
 }
 
 export function SetCursor(arg1) {

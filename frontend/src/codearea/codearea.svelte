@@ -1,57 +1,60 @@
 <script>
-    export let file = "";
-
     import Line from "./line.svelte";
     import Cursor from "./cursor";
-    import Keys from "./keys";
     import { onMount } from "svelte";
-    import { GetBuffer, GetCursor } from "../../wailsjs/go/api/Api";
     import { EventsOn } from "../../wailsjs/runtime/runtime";
+    import {
+        GetBuffer,
+        GetCursor,
+        HandleKeyboardEvent,
+    } from "../../wailsjs/go/api/Api";
 
+    export let file = "";
+    
     let lines = [];
-    let cursor, keys;
+    let cursor;
     let elementLines = [];
     let codearea;
 
     onMount(async () => {
-        keys = new Keys(file);
         cursor = new Cursor(file, codearea);
 
         var bufferInit = async () => {
-            let buf = await GetBuffer(file);
-            console.log(`buffer loaded ${file}`);
-            lines = buf.lines;
+            lines = (await GetBuffer(file)).lines;
         };
 
         bufferInit();
 
         EventsOn(`highlight_changed_${file}`, (event) => {
-            console.log(`highlight changed ${file}`);
-
             lines = event.data.lines;
 
             GetCursor(file).then((selection, err) => {
                 if (err) {
-                    console.log(err);
-                    return;
+                    console.error(err);
+                } else {
+                    cursor.setSelection(selection, elementLines);
                 }
-
-                console.log(selection);
-                cursor.setSelection(selection, elementLines);
-                console.log("set");
             });
         });
 
         EventsOn(`cursor_moved_${file}`, (event) => {
-            console.log(event);
-            console.log(elementLines);
             cursor.setSelection(event.data, elementLines);
         });
     });
 
     function onKeyDown(event) {
-        console.log(event);
-        keys.onKeyDown(event, cursor, elementLines);
+        HandleKeyboardEvent({
+            buffer: file,
+            key: event.key,
+            alt: event.altKey,
+            ctrl: event.ctrlKey,
+            shift: event.shiftKey,
+            meta: event.metaKey,
+        }).then((err) => {
+            if (err) {
+                console.error(err);
+            }
+        });
     }
 </script>
 
@@ -61,35 +64,28 @@
             <code class={"gutter-line"}>{index + 1}</code>
         {/each}
     </div>
-    <div bind:this={codearea} class="container" contenteditable="true">
+    <div
+        bind:this={codearea}
+        class="container"
+        contenteditable="true"
+        on:keydown|self|capture|stopPropagation|preventDefault={onKeyDown}
+    >
         {#each lines as line, index (line)}
             <Line
                 bind:node={elementLines[index]}
                 buffer={file}
                 line={index}
                 tokens={line}
-                sendSelection={(line) => {
-                    cursor.sendSelection(
-                        line,
-                        elementLines[line].children.length - 1,
-                        elementLines
-                    );
-                }}
-                tokenSendSelection={(line, token) => {
-                    cursor.sendSelection(line, token, elementLines);
-                }}
             />
         {/each}
     </div>
 </div>
 
-<svelte:window on:keydown={onKeyDown} />
-
 <style>
     .codearea {
         display: flex;
         height: 100%;
-        overflow: hidden;
+        overflow: scroll;
         user-select: none;
         -webkit-user-select: none;
     }
@@ -101,7 +97,7 @@
         outline: none;
         user-select: none;
         -webkit-user-select: none;
-        width: 100%;
+        resize: horizontal;
     }
 
     .gutter {

@@ -2,7 +2,6 @@ package main
 
 import (
 	"embed"
-	_ "embed"
 
 	"github.com/KlyuchnikovV/edicode/api"
 	"github.com/KlyuchnikovV/edicode/core"
@@ -22,7 +21,7 @@ func main() {
 		Height:           700,
 		Title:            "edicode",
 		Assets:           assets,
-		BackgroundColour: options.NewRGB(255, 255, 255),
+		BackgroundColour: options.NewRGB(40, 44, 52),
 		OnStartup:        onStartup(api),
 		Bind: []interface{}{
 			api,

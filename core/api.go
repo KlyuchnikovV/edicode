@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"log"
+	"os"
 	"sort"
 	"time"
 
@@ -37,46 +38,6 @@ func (core *Core) HandleKeyboardEvent(event buffer.KeyboardEvent) error {
 	}
 
 	buffer.KeyEvents <- event
-
-	// switch {
-	// case event.Key == "Backspace":
-	// 	log.Printf("HANDLE: backspace event is %#v", event)
-	// 	if err := buf.Delete(1); err != nil {
-	// 		panic(err)
-	// 	}
-	// 	// buf.KeyboardEvents() <- event
-	// case event.Key == "ArrowLeft":
-	// 	buf.CursorLeft(event.Shift)
-	// 	// buf.KeyboardEvents() <- event
-	// case event.Key == "ArrowRight":
-	// 	buf.CursorRight(event.Shift)
-	// 	// buf.KeyboardEvents() <- event
-	// case event.Key == "ArrowUp":
-	// 	buf.CursorUp(event.Shift)
-	// 	// buf.KeyboardEvents() <- event
-	// case event.Key == "ArrowDown":
-	// 	buf.CursorDown(event.Shift)
-	// 	// buf.KeyboardEvents() <- event
-	// case event.Key == "Enter":
-	// 	// buf.KeyboardEvents() <- event
-	// 	if err := buf.Append('\n'); err != nil {
-	// 		panic(err)
-	// 	}
-	// case event.Key == "Escape":
-	// 	log.Printf("EXITING")
-	// 	os.Exit(0)
-	// case len(event.Key) == 1:
-	// 	log.Printf("HANDLE: event is %#v", event)
-	// 	if err := buf.Append(rune(event.Key[0])); err != nil {
-	// 		panic(err)
-	// 	}
-	// 	// buf.KeyboardEvents() <- event
-	// case event.Key == "Tab":
-	// 	if err := buf.Append('\t'); err != nil {
-	// 		panic(err)
-	// 	}
-	// 	// buf.KeyboardEvents() <- event
-	// }
 
 	return nil
 }
@@ -175,4 +136,64 @@ func (core *Core) SetCursor(event types.CaretMovedEvent) (*types.GetCaretRespons
 	})
 
 	return core.GetCursor(event.Buffer)
+}
+
+func (core *Core) MouseUp(event types.MouseEvent) error {
+	buf, ok := core.buffers[event.Buffer]
+	if !ok {
+		return fmt.Errorf("buf '%s' not found", event.Buffer)
+	}
+
+	buf.SetEnd(event.Line, event.Offset)
+
+	return nil
+}
+
+func (core *Core) MouseDown(event types.MouseEvent) error {
+	buf, ok := core.buffers[event.Buffer]
+	if !ok {
+		return fmt.Errorf("buf '%s' not found", event.Buffer)
+	}
+
+	buf.SetStart(event.Line, event.Offset)
+
+	fmt.Println(event)
+	return nil
+}
+
+func (core *Core) GetActionsList(filterBy string) []string {
+	var result = make([]string, 0, len(core.actions))
+
+	for _, action := range core.actions {
+		if action.Filter(filterBy) {
+			result = append(result, action.Name())
+		}
+	}
+
+	return result
+}
+
+func (core *Core) MakeAction(action string, param string) error {
+	for _, act := range core.actions {
+		if act.Name() == action {
+			return act.Do(param)
+		}
+	}
+
+	return fmt.Errorf("no action found '%s'", action)
+}
+
+func (core *Core) SaveBuffer(name string) error {
+	buf, ok := core.buffers[name]
+	if !ok {
+		return fmt.Errorf("buf '%s' not found", name)
+	}
+
+	file, err := os.OpenFile(buf.Name(), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
+	if err != nil {
+		return err
+	}
+
+	_, err = file.WriteAt([]byte(buf.String()), 0)
+	return err
 }
