@@ -1,0 +1,7 @@
+{
+    "pluginsPath": "./plugins",
+    "buildPath": "./build",
+    "plugins": [
+        "director"
+    ]
+}

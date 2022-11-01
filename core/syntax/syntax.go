@@ -84,9 +84,14 @@ func (p Parser) Tokenize(text string) ([]types.Token, error) {
 			str = string(char)
 		}
 
+		var offset = 0
+		if len(result) > 0 {
+			offset = result[len(result)-1].NextOffset()
+		}
+
 		token = types.Token{
 			Value:   str,
-			Offset:  result[len(result)-1].NextOffset(),
+			Offset:  offset,
 			Classes: types.Classes{class},
 		}
 	}

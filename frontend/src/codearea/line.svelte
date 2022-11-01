@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import Token from "./token.svelte";
     import { MouseDown } from "../../wailsjs/go/api/Api.js";
 
@@ -62,15 +62,16 @@
 
 <style>
     .line {
-        width: inherit;
+        /* width: inherit; */
         user-select: none;
         -webkit-user-select: none;
     }
 
+    /*
     div:empty {
         white-space: pre;
         tab-size: 4;
         outline: none;
         height: 100%;
-    }
+    } */
 </style>

@@ -6,6 +6,10 @@ export function Bind(arg1) {
   return window['go']['api']['Api']['Bind'](arg1);
 }
 
+export function CloseFile(arg1) {
+  return window['go']['api']['Api']['CloseFile'](arg1);
+}
+
 export function GetActionsList(arg1) {
   return window['go']['api']['Api']['GetActionsList'](arg1);
 }
@@ -22,6 +26,14 @@ export function GetCursor(arg1) {
   return window['go']['api']['Api']['GetCursor'](arg1);
 }
 
+export function GetPanelTabs() {
+  return window['go']['api']['Api']['GetPanelTabs']();
+}
+
+export function GetRightPanels() {
+  return window['go']['api']['Api']['GetRightPanels']();
+}
+
 export function HandleKeyboardEvent(arg1) {
   return window['go']['api']['Api']['HandleKeyboardEvent'](arg1);
 }
@@ -32,10 +44,6 @@ export function LengthOfBuffer(arg1) {
 
 export function LengthOfLine(arg1) {
   return window['go']['api']['Api']['LengthOfLine'](arg1);
-}
-
-export function MakeAction(arg1) {
-  return window['go']['api']['Api']['MakeAction'](arg1);
 }
 
 export function MouseDown(arg1) {

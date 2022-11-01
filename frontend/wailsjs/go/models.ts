@@ -1,3 +1,57 @@
+export namespace plugins {
+	
+	export class Action {
+	    name: string;
+	    action: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Action(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.action = source["action"];
+	    }
+	}
+	export class PanelEntry {
+	    name: string;
+	    file: string;
+	    icon: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new PanelEntry(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.file = source["file"];
+	        this.icon = source["icon"];
+	    }
+	}
+
+}
+
+export namespace selection {
+	
+	export class Caret {
+	    line: number;
+	    offset: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new Caret(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.line = source["line"];
+	        this.offset = source["offset"];
+	    }
+	}
+
+}
+
 export namespace types {
 	
 	export class Token {
@@ -98,25 +152,6 @@ export namespace types {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.buffer = source["buffer"];
 	        this.line = source["line"];
-	    }
-	}
-
-}
-
-export namespace selection {
-	
-	export class Caret {
-	    line: number;
-	    offset: number;
-	
-	    static createFrom(source: any = {}) {
-	        return new Caret(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.line = source["line"];
-	        this.offset = source["offset"];
 	    }
 	}
 

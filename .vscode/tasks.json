@@ -2,122 +2,108 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "npm install",
+      "type": "npm",
+      "script": "install",
+      "options": {
+        "cwd": "${workspaceFolder}/frontend",
+        "env": {
+          "CGO_CFLAGS": "-mmacosx-version-min=10.13",
+          "CGO_CXXFLAGS": "-I/Users/klyuchnikovv/go/src/github.com/KlyuchnikovV/edicode/build",
+          "CGO_ENABLED": "1",
+          "CGO_LDFLAGS": "-framework UniformTypeIdentifiers -mmacosx-version-min=10.13",
+          "GOOS": "darwin",
+          "GOARCH": "arm64"
+        }
+      },
+      "presentation": {
+        "clear": true,
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "npm run build",
+      "type": "npm",
+      "script": "build",
+      "options": {
+        "cwd": "${workspaceFolder}/frontend",
+        "env": {
+          "CGO_CFLAGS": "-mmacosx-version-min=10.13",
+          "CGO_CXXFLAGS": "-I/Users/klyuchnikovv/go/src/github.com/KlyuchnikovV/edicode/build",
+          "CGO_ENABLED": "1",
+          "CGO_LDFLAGS": "-framework UniformTypeIdentifiers -mmacosx-version-min=10.13",
+          "GOOS": "darwin",
+          "GOARCH": "arm64"
+        }
+      },
+      "presentation": {
+        "clear": true,
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "build",
       "type": "shell",
       "options": {
         "cwd": "${workspaceFolder}",
         "env": {
-          "CGO_ENABLED": "1"
+          "CGO_CFLAGS": "-mmacosx-version-min=10.13",
+          "CGO_CXXFLAGS": "-I/Users/klyuchnikovv/go/src/github.com/KlyuchnikovV/edicode/build",
+          "CGO_ENABLED": "1",
+          "CGO_LDFLAGS": "-framework UniformTypeIdentifiers -mmacosx-version-min=10.13",
+          "GOOS": "darwin",
+          "GOARCH": "arm64"
         }
       },
-      "osx": {
-        "options": {
-          "env": {
-            "CGO_CFLAGS": "-mmacosx-version-min=10.13",
-            "CGO_LDFLAGS": "-framework UniformTypeIdentifiers -mmacosx-version-min=10.13"
-          }
-        }
-      },
-      "windows": {
-        "options": {
-          "env": {
-            "CGO_ENABLED": "0"
-          }
-        }
-      },
-      "command": "go",
-      "args": [
-        "build",
-        "-tags",
-        "production,desktop",
-        "-gcflags",
-        "all=-N -l",
-        "-o",
-        "build/bin/edicode"
-      ]
-    },
-    {
-      "label": "build debug",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}",
-        "env": {
-          "CGO_ENABLED": "1"
-        }
-      },
-      "osx": {
-        "options": {
-          "env": {
-            "CGO_CFLAGS": "-mmacosx-version-min=10.13",
-            "CGO_LDFLAGS": "-framework UniformTypeIdentifiers -mmacosx-version-min=10.13"
-          }
-        }
-      },
-      "windows": {
-        "options": {
-          "env": {
-            "CGO_ENABLED": "0"
-          }
-        }
-      },
-      "command": "go",
-      "args": [
-        "build",
-        "-tags",
-        "dev",
-        "-gcflags",
-        "all=-N -l",
-        "-o",
-        "build/bin/edicode"
-      ]
-    },
-    {
-      "label": "build dev",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}",
-        "env": {
-          "CGO_ENABLED": "1"
-        }
-      },
-      "osx": {
-        "options": {
-          "env": {
-            "CGO_CFLAGS": "-mmacosx-version-min=10.13",
-            "CGO_LDFLAGS": "-framework UniformTypeIdentifiers -mmacosx-version-min=10.13"
-          }
-        }
-      },
-      "windows": {
-        "options": {
-          "env": {
-            "CGO_ENABLED": "0"
-          }
-        }
-      },
-      "command": "go",
-      "args": [
-        "build",
-        "-tags",
-        "dev",
-        "-gcflags",
-        "all=-N -l",
-        "-o",
-        "build/bin/edicode"
-      ]
-    },
-    {
-      "label": "rebuild",
-      "type": "shell",
-      "command": "wails",
-      "args": [
-        "dev"
+      "command": "go build -tags dev -gcflags \"all=-N -l\" -o=build/edicode",
+      "dependsOn": [
+        "npm run build"
       ],
       "problemMatcher": [],
       "group": {
         "kind": "build",
         "isDefault": true
       }
-    }
+    },
+    {
+      "label": "rebuild",
+      "type": "shell",
+      "command": "wails",
+      "args": [
+        "dev",
+        "-v=2",
+        "-loglevel=Debug"
+      ],
+      "problemMatcher": [],
+      "group": "build"
+    },
+        {
+          "label": "build only back",
+          "type": "shell",
+          "options": {
+            "cwd": "${workspaceFolder}",
+            "env": {
+              "CGO_CFLAGS": "-mmacosx-version-min=10.13",
+              "CGO_CXXFLAGS": "-I/Users/klyuchnikovv/go/src/github.com/KlyuchnikovV/edicode/build",
+              "CGO_ENABLED": "1",
+              "CGO_LDFLAGS": "-framework UniformTypeIdentifiers -mmacosx-version-min=10.13",
+              "GOOS": "darwin",
+              "GOARCH": "arm64"
+            }
+          },
+          "command": "go build -tags dev -gcflags \"all=-N -l\" -o=build/edicode",
+          "dependsOn": [
+            // "npm run build"
+          ],
+          "problemMatcher": [],
+          "group": {
+            "kind": "build",
+            "isDefault": true
+          }
+        },
   ]
 }

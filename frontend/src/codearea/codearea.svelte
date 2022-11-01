@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import Line from "./line.svelte";
     import Cursor from "./cursor";
     import { onMount } from "svelte";
@@ -10,13 +10,15 @@
     } from "../../wailsjs/go/api/Api";
 
     export let file = "";
-    
+    export let shouldScrollPastEnd = true;
+
     let lines = [];
     let cursor;
     let elementLines = [];
     let codearea;
 
     onMount(async () => {
+        console.log(`codearea ${file}`);
         cursor = new Cursor(file, codearea);
 
         var bufferInit = async () => {
@@ -28,7 +30,7 @@
         EventsOn(`highlight_changed_${file}`, (event) => {
             lines = event.data.lines;
 
-            GetCursor(file).then((selection, err) => {
+            GetCursor(file).then((selection: any, err: Error) => {
                 if (err) {
                     console.error(err);
                 } else {
@@ -59,7 +61,7 @@
 </script>
 
 <div id={`codearea-${file}`} class="codearea">
-    <div class={"gutter"}>
+    <div class="gutter">
         {#each lines as _, index (index)}
             <code class={"gutter-line"}>{index + 1}</code>
         {/each}
@@ -67,6 +69,7 @@
     <div
         bind:this={codearea}
         class="container"
+        class:scrollpastend={shouldScrollPastEnd}
         contenteditable="true"
         on:keydown|self|capture|stopPropagation|preventDefault={onKeyDown}
     >
@@ -83,9 +86,10 @@
 
 <style>
     .codearea {
+        /* visibility: hidden; */
         display: flex;
-        height: 100%;
-        overflow: scroll;
+        /* height: 100%; */
+        /* overflow: scroll; */
         user-select: none;
         -webkit-user-select: none;
     }
@@ -97,13 +101,22 @@
         outline: none;
         user-select: none;
         -webkit-user-select: none;
-        resize: horizontal;
+        /* resize: horizontal; */
+        margin-left: 10px;
+
+        overflow: scroll;
+    }
+
+    .scrollpastend {
+        padding-bottom: 87vh;
     }
 
     .gutter {
         padding: 0 5px;
         box-sizing: border-box;
         border-right: 1px black solid;
+        /* position: absolute; */
+        /* background-color: rgba(27, 38, 54, 1); */
     }
 
     .gutter-line {
@@ -111,6 +124,9 @@
         display: block;
         text-align: right;
         outline: none;
+        color: gray;
+        overflow: hidden;
+        /* border-bottom: 1px white solid; */
     }
 
     :global(code, div.line) {
@@ -118,5 +134,18 @@
         font: 15px/24px "Fira Code", sans-serif;
         letter-spacing: 1px;
         user-select: text;
+        padding: 0;
+    }
+
+    @media (min-width: 768px) {
+        .container {
+            max-width: none;
+        }
+    }
+
+    @media (min-width: 640px) {
+        .container {
+            max-width: none;
+        }
     }
 </style>

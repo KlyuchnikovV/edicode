@@ -5,9 +5,10 @@ import (
 	"log"
 	"os"
 	"sort"
+	"strings"
 	"time"
 
-	"github.com/KlyuchnikovV/edicode/core/plugin"
+	"github.com/KlyuchnikovV/edicode/core/plugins"
 	"github.com/KlyuchnikovV/edicode/core/syntax"
 	"github.com/KlyuchnikovV/edicode/types"
 	buffer "github.com/KlyuchnikovV/simple_buffer"
@@ -52,25 +53,25 @@ func (core *Core) GetBufferNames() []string {
 		result = append(result, name)
 	}
 
-	sort.Slice(result, func(i, j int) bool {
-		for k := 0; k < len(result[i]); k++ {
-			if k >= len(result[j]) {
-				return false
-			}
-			if result[i][k] != result[j][k] {
-				return result[i][k] < result[j][k]
-			}
-		}
-		return true
-	})
+	// sort.Slice(result, func(i, j int) bool {
+	// 	for k := 0; k < len(result[i]); k++ {
+	// 		if k >= len(result[j]) {
+	// 			return false
+	// 		}
+	// 		if result[i][k] != result[j][k] {
+	// 			return result[i][k] < result[j][k]
+	// 		}
+	// 	}
+	// 	return true
+	// })
 
 	log.Printf("LOG: buffers are %#v", result)
 	return result
 }
 
-func (core *Core) OnBufferChange(event plugin.Event) error {
+func (core *Core) OnBufferChange(event plugins.Event) error {
 	log.Printf("HIGHLIGHT: got event %#v", event)
-	buffer, err := core.GetBuffer(event.(plugin.BufferChangeEvent).Buffer)
+	buffer, err := core.GetBuffer(event.(plugins.BufferChangeEvent).Buffer)
 	if err != nil {
 		return err
 	}
@@ -126,7 +127,7 @@ func (core *Core) SetCursor(event types.CaretMovedEvent) (*types.GetCaretRespons
 		return nil, fmt.Errorf("buf '%s' not found", event.Buffer)
 	}
 
-	buf.SetSelection(event.Start, event.End)
+	buf.SetStartAndEnd(event.Start, event.End)
 
 	start, end := buf.GetSelection()
 	core.Emit("cursor_moved", event.Buffer, types.GetCaretResponse{
@@ -161,28 +162,6 @@ func (core *Core) MouseDown(event types.MouseEvent) error {
 	return nil
 }
 
-func (core *Core) GetActionsList(filterBy string) []string {
-	var result = make([]string, 0, len(core.actions))
-
-	for _, action := range core.actions {
-		if action.Filter(filterBy) {
-			result = append(result, action.Name())
-		}
-	}
-
-	return result
-}
-
-func (core *Core) MakeAction(action string, param string) error {
-	for _, act := range core.actions {
-		if act.Name() == action {
-			return act.Do(param)
-		}
-	}
-
-	return fmt.Errorf("no action found '%s'", action)
-}
-
 func (core *Core) SaveBuffer(name string) error {
 	buf, ok := core.buffers[name]
 	if !ok {
@@ -196,4 +175,27 @@ func (core *Core) SaveBuffer(name string) error {
 
 	_, err = file.WriteAt([]byte(buf.String()), 0)
 	return err
+}
+
+func (core *Core) GetActionsList(filterBy string) []plugins.Action {
+	var result = make([]plugins.Action, 0)
+
+	for _, plug := range core.Manager.Plugins() {
+		if plug.Actions == nil {
+			continue
+		}
+
+		for name := range plug.Actions() {
+			result = append(result, plugins.Action{
+				Name:   fmt.Sprintf("%s: %s", plug.Config.Name, name),
+				Action: fmt.Sprintf("%s.%s", strings.ToLower(plug.Config.Name), name),
+			})
+		}
+	}
+
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].Name < result[j].Name
+	})
+
+	return result
 }

@@ -7,7 +7,6 @@ import (
 type Core interface {
 	GetBuffer(string) (*BufferData, error)
 
-	OnInit(string, func(...interface{}))
 	Emit(string, string, interface{})
 	EmitTimed(string, string, int64, interface{})
 }
@@ -71,5 +70,6 @@ type MouseEvent struct {
 
 type ActionParams struct {
 	Action string `json:"action"`
+	Buffer string `json:"buffer"`
 	Param  string `json:"param"`
 }

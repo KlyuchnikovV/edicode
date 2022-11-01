@@ -4,8 +4,9 @@ import (
 	"log"
 
 	"github.com/KlyuchnikovV/edicode/core"
+	"github.com/KlyuchnikovV/edicode/core/plugins"
 	"github.com/KlyuchnikovV/edicode/types"
-	"github.com/KlyuchnikovV/simple_buffer"
+	buffer "github.com/KlyuchnikovV/simple_buffer"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -31,7 +32,7 @@ func (api *Api) GetBuffer(name string) (types.BufferData, error) {
 
 func (api *Api) HandleKeyboardEvent(data map[string]interface{}) error {
 	log.Printf("API: %#v", data)
-	var event simple_buffer.KeyboardEvent
+	var event buffer.KeyboardEvent
 	if err := mapstructure.Decode(data, &event); err != nil {
 		return err
 	}
@@ -82,14 +83,14 @@ func (api *Api) MouseUp(data map[string]interface{}) error {
 	return api.core.MouseUp(event)
 }
 
-func (api *Api) GetActionsList(filterBy string) []string {
-	return api.core.GetActionsList(filterBy)
+func (api *Api) CloseFile(name string) error {
+	return api.core.CloseFile(name)
 }
 
-func (api *Api) MakeAction(data map[string]interface{}) error {
-	var action types.ActionParams
-	if err := mapstructure.Decode(data, &action); err != nil {
-		return err
-	}
-	return api.core.MakeAction(action.Action, action.Param)
+func (api *Api) GetRightPanels() []plugins.PanelEntry {
+	return api.core.RightPanels()
+}
+
+func (api *Api) GetActionsList(filterBy string) []plugins.Action {
+	return api.core.GetActionsList(filterBy)
 }

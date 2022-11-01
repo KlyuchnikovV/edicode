@@ -5,7 +5,7 @@ import (
 
 	"github.com/KlyuchnikovV/edicode/api"
 	"github.com/KlyuchnikovV/edicode/core"
-	"github.com/wailsapp/wails/v2"
+	"github.com/wailsapp/wails/v2/pkg/application"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"golang.org/x/net/context"
 )
@@ -15,29 +15,42 @@ var assets embed.FS
 
 func main() {
 	var api = api.New()
+	c, err := core.New("main.go")
+	if err != nil {
+		panic(err)
+	}
 
-	if err := wails.Run(&options.App{
+	api.Bind(c)
+
+	// var binds = []interface{}{
+	// 	api,
+	// 	&plugins.Plugin{},
+	// }
+
+	// for _, bind := range c.Manager.Plugins() {
+	// 	binds = append(binds, bind)
+	// }
+
+	mainApp := application.NewWithOptions(&options.App{
 		Width:            1000,
 		Height:           700,
 		Title:            "edicode",
 		Assets:           assets,
 		BackgroundColour: options.NewRGB(40, 44, 52),
-		OnStartup:        onStartup(api),
+		OnStartup:        onStartup(c),
 		Bind: []interface{}{
 			api,
+			c.Manager,
 		},
-	}); err != nil {
+	})
+
+	if err := mainApp.Run(); err != nil {
 		panic(err)
 	}
 }
 
-func onStartup(api *api.Api) func(ctx context.Context) {
+func onStartup(c *core.Core) func(ctx context.Context) {
 	return func(ctx context.Context) {
-		c, err := core.New(ctx, "main.go")
-		if err != nil {
-			panic(err)
-		}
-
-		api.Bind(c)
+		c.Init(ctx)
 	}
 }
