@@ -12,6 +12,7 @@ import (
 	"github.com/KlyuchnikovV/edicode/core/syntax"
 	"github.com/KlyuchnikovV/edicode/types"
 	buffer "github.com/KlyuchnikovV/simple_buffer"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 func (core *Core) GetBuffer(name string) (*types.BufferData, error) {
@@ -53,17 +54,21 @@ func (core *Core) GetBufferNames() []string {
 		result = append(result, name)
 	}
 
-	// sort.Slice(result, func(i, j int) bool {
-	// 	for k := 0; k < len(result[i]); k++ {
-	// 		if k >= len(result[j]) {
-	// 			return false
-	// 		}
-	// 		if result[i][k] != result[j][k] {
-	// 			return result[i][k] < result[j][k]
-	// 		}
-	// 	}
-	// 	return true
-	// })
+	sort.Slice(result, func(i, j int) bool {
+		for k := 0; k < len(result[i]); k++ {
+			if core.buffers[result[i]].ModifiedAt != core.buffers[result[j]].ModifiedAt {
+				return core.buffers[result[i]].ModifiedAt < core.buffers[result[j]].ModifiedAt
+			}
+
+			if k >= len(result[j]) {
+				return false
+			}
+			if result[i][k] != result[j][k] {
+				return result[i][k] < result[j][k]
+			}
+		}
+		return true
+	})
 
 	log.Printf("LOG: buffers are %#v", result)
 	return result
@@ -198,4 +203,12 @@ func (core *Core) GetActionsList(filterBy string) []plugins.Action {
 	})
 
 	return result
+}
+
+func (core *Core) OpenDirectoryDialog(options runtime.OpenDialogOptions) (string, error) {
+	return runtime.OpenDirectoryDialog(core.Context, options)
+}
+
+func (core *Core) OpenFileDialog(options runtime.OpenDialogOptions) (string, error) {
+	return runtime.OpenFileDialog(core.Context, options)
 }

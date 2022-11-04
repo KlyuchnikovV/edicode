@@ -1,7 +1,13 @@
 <script>
     import { MakeAction } from "../../wailsjs/go/plugins/Manager";
-
+    import { EventsOn } from "../../wailsjs/runtime/runtime";
     import { GetActionsList } from "../../wailsjs/go/api/Api";
+
+    export let config = {
+        fontSize: "15px",
+        fontFamily: '"Fira Code", sans-serif',
+        lineHeight: "24px",
+    };
 
     let value = "";
     let actions = [];
@@ -20,6 +26,14 @@
     function onclick(event, action) {
         MakeAction(action);
     }
+
+    EventsOn(`plugins_loaded_all`, async () => {
+        GetActionsList(value).then((result) => {
+            console.log("actions");
+            console.log(result);
+            actions = result;
+        });
+    });
 </script>
 
 <div class="explorer">
@@ -29,6 +43,9 @@
         class="palette"
         placeholder="Search..."
         on:input={oninput}
+        style:font-size={config.fontSize}
+        style:font-family={config.fontFamily}
+        style:line-height={config.lineHeight}
     />
     <div>
         {#each actions as action, id (id)}
@@ -62,7 +79,7 @@
         /* width: 90%; */
         /* margin-top: 1em; */
 
-        font: 15px/24px "Fira Code", sans-serif;
+        /* font: 15px/24px "Fira Code", sans-serif; */
         letter-spacing: 1px;
         user-select: text;
         color: black;
@@ -78,13 +95,14 @@
     }
 
     .action {
-        font: 15px/24px "Fira Code", sans-serif;
+        /* font: 15px/24px "Fira Code", sans-serif; */
         letter-spacing: 1px;
         user-select: text;
 
         width: 90%;
         margin-top: 1em;
         cursor: pointer;
+        overflow: hidden;
         /* background-color: #1e2025; */
     }
 
@@ -101,7 +119,7 @@
         color: #ffffff;
         cursor: pointer;
         display: inline-block;
-        font: 15px/24px "Fira Code", sans-serif;
+        /* font: 15px/24px "Fira Code", sans-serif; */
         line-height: normal;
         margin: 0;
         min-height: 60px;

@@ -67,7 +67,7 @@ func (plug *Plugin) Executable() string {
 func (plug *Plugin) BuildBackend() error {
 	var (
 		cmd = exec.Command(
-			"go", "build",
+			"go1.19.3", "build",
 			`-tags=dev`,
 			"-gcflags", "all=-N -l",
 			`-buildmode=plugin`,

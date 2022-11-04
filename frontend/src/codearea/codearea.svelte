@@ -9,7 +9,7 @@
         HandleKeyboardEvent,
     } from "../../wailsjs/go/api/Api";
 
-    export let file = "";
+    export let buffer = "";
     export let shouldScrollPastEnd = true;
 
     let lines = [];
@@ -17,20 +17,26 @@
     let elementLines = [];
     let codearea;
 
+    $: {
+        async()=> {
+            lines = (await GetBuffer(buffer)).lines;
+        }
+    }
+
     onMount(async () => {
-        console.log(`codearea ${file}`);
-        cursor = new Cursor(file, codearea);
+        console.log(`codearea ${buffer}`);
+        cursor = new Cursor(buffer, codearea);
 
         var bufferInit = async () => {
-            lines = (await GetBuffer(file)).lines;
+            lines = (await GetBuffer(buffer)).lines;
         };
 
         bufferInit();
 
-        EventsOn(`highlight_changed_${file}`, (event) => {
+        EventsOn(`highlight_changed_${buffer}`, (event) => {
             lines = event.data.lines;
 
-            GetCursor(file).then((selection: any, err: Error) => {
+            GetCursor(buffer).then((selection: any, err: Error) => {
                 if (err) {
                     console.error(err);
                 } else {
@@ -39,14 +45,14 @@
             });
         });
 
-        EventsOn(`cursor_moved_${file}`, (event) => {
+        EventsOn(`cursor_moved_${buffer}`, (event) => {
             cursor.setSelection(event.data, elementLines);
         });
     });
 
     function onKeyDown(event) {
         HandleKeyboardEvent({
-            buffer: file,
+            buffer: buffer,
             key: event.key,
             alt: event.altKey,
             ctrl: event.ctrlKey,
@@ -60,7 +66,7 @@
     }
 </script>
 
-<div id={`codearea-${file}`} class="codearea">
+<div id={`codearea-${buffer}`} class="codearea">
     <div class="gutter">
         {#each lines as _, index (index)}
             <code class={"gutter-line"}>{index + 1}</code>
@@ -68,7 +74,7 @@
     </div>
     <div
         bind:this={codearea}
-        class="container"
+        class="text-container"
         class:scrollpastend={shouldScrollPastEnd}
         contenteditable="true"
         on:keydown|self|capture|stopPropagation|preventDefault={onKeyDown}
@@ -76,7 +82,7 @@
         {#each lines as line, index (line)}
             <Line
                 bind:node={elementLines[index]}
-                buffer={file}
+                {buffer}
                 line={index}
                 tokens={line}
             />
@@ -94,7 +100,7 @@
         -webkit-user-select: none;
     }
 
-    .container {
+    .text-container {
         padding: 0 5px;
         text-align: left;
         display: inline;
@@ -126,6 +132,8 @@
         outline: none;
         color: gray;
         overflow: hidden;
+        user-select: none;
+        -webkit-user-select: none;
         /* border-bottom: 1px white solid; */
     }
 
@@ -135,17 +143,5 @@
         letter-spacing: 1px;
         user-select: text;
         padding: 0;
-    }
-
-    @media (min-width: 768px) {
-        .container {
-            max-width: none;
-        }
-    }
-
-    @media (min-width: 640px) {
-        .container {
-            max-width: none;
-        }
     }
 </style>

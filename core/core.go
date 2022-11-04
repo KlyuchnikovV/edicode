@@ -100,6 +100,11 @@ func (core *Core) on(eventName string, handler plugins.On) func(...interface{}) 
 }
 
 func (core *Core) OpenFile(path string) error {
+	if _, ok := core.buffers[path]; ok {
+		core.Emit("buffer", "opened", path)
+		return nil
+	}
+
 	file, err := os.Open(path)
 	if err != nil {
 		return err

@@ -1,24 +1,22 @@
 <script>
     export let onclick;
-    export let icon;
     export let selected = false;
+
+    export let config = {
+        width: "2em",
+        icon: "",
+    };
 </script>
 
-<div on:click={onclick} class:selected>
-    <i class:selected class="material-icons-outlined md-36">{icon}</i>
+<div on:click={onclick} class:selected style:height={config.width}>
+    <i class:selected class="material-icons-outlined md-36">{config.icon}</i>
 </div>
 
 <style>
-    div {
-        height: 3em;
-        padding: 6px;
-    }
-
     i {
-        /* width: 2em;
-        height: 2em; */
         cursor: pointer;
         color: grey;
+        vertical-align: middle;
     }
 
     div.selected {

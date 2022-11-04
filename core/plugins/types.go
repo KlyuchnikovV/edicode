@@ -10,6 +10,7 @@ import (
 
 	"github.com/KlyuchnikovV/edicode/types"
 	buffer "github.com/KlyuchnikovV/simple_buffer"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type Context interface {
@@ -31,6 +32,8 @@ type Context interface {
 	EmitTimed(object, action string, timestamp int64, data interface{})
 	// TODO:
 	GetActionsList(filterBy string) []Action
+	OpenDirectoryDialog(runtime.OpenDialogOptions) (string, error)
+	OpenFileDialog(runtime.OpenDialogOptions) (string, error)
 }
 
 type (
@@ -48,9 +51,6 @@ type (
 	Bind func() map[string]On
 
 	Event interface {
-		// Source() string
-		// Destination() string
-		// String() string
 	}
 )
 

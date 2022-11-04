@@ -9,11 +9,11 @@
 	import Sidepanel from "./sidepanel/sidepanel.svelte";
 	import Explorer from "./explorer/explorer.svelte";
 
-	let hasLeft = false;
+	let hasLeft = true;
 	let hasRight = true;
 	let hasFooter = true;
 
-	let buffers = [];
+	// let buffers = [];
 	let plugins = [];
 	let items = [
 		{
@@ -25,17 +25,17 @@
 		},
 	];
 
-	onMount(async () => {
-		buffers = await GetBufferNames();
-		console.log(plugins);
-	});
+	// onMount(async () => {
+	// 	buffers = await GetBufferNames();
+	// 	console.log(plugins);
+	// });
 
-	EventsOn(`buffer_opened`, async () => {
-		buffers = await GetBufferNames();
-	});
-	EventsOn(`buffer_closed`, async () => {
-		buffers = await GetBufferNames();
-	});
+	// EventsOn(`buffer_opened`, async () => {
+	// 	buffers = await GetBufferNames();
+	// });
+	// EventsOn(`buffer_closed`, async () => {
+	// 	buffers = await GetBufferNames();
+	// });
 	EventsOn(`plugins_loaded_all`, async () => {
 		console.log("plugins all loaded");
 		plugins = await GetRightPanels();
@@ -58,19 +58,19 @@
 <main>
 	<Flex bind:hasLeft bind:hasRight bind:hasFooter>
 		<div class="left" slot="left">
-			<h2>Left</h2>
+			<h2 class="left-panel">Left</h2>
 		</div>
 
 		<div class="center" slot="center">
-			<Tabs {buffers} />
+			<Tabs />
 		</div>
 
 		<div class="right-panel" slot="right" let:toggle>
 			<Sidepanel {items} {toggle} />
 		</div>
-
-		<h2 class="footer" slot="footer">Footer</h2>
+		<h2 class="bottom-panel" slot="footer">Bottom-bar</h2>
 	</Flex>
+	<footer class="footer">Footer</footer>
 </main>
 
 <style>
@@ -83,6 +83,8 @@
 		bottom: 0;
 		overflow: hidden;
 		height: 100%;
+		display: flex;
+		flex-direction: column;
 	}
 
 	h2 {
@@ -109,6 +111,7 @@
 	.left {
 		/* background-color: blue; */
 		width: 100%;
+		height: 100%;
 		user-select: none;
 	}
 
@@ -125,9 +128,25 @@
 		overflow: hidden;
 		user-select: none;
 		height: 100%;
+		border-left: solid 1px black;
+	}
+
+	.left-panel {
+		width: 100%;
+		overflow: hidden;
+		user-select: none;
+		height: 100%;
+		border-right: solid 1px black;
+	}
+
+	.bottom-panel {
+		bottom: 0;
+		width: 100%;
+		border-top: solid 1px black;
 	}
 
 	.footer {
+		bottom: 0;
 		/* background-color: black; */
 		width: 100%;
 	}
@@ -161,5 +180,14 @@
 	}
 	:global(.material-icons-outlined.md-48) {
 		font-size: 48px;
+	}
+
+	/* Overscroll of html element */
+	:global(html) {
+		overflow: hidden;
+		height: 100%;
+	}
+	:global(body) {
+		height: 100%;
 	}
 </style>

@@ -1,36 +1,36 @@
 {
   "version": "0.2.0",
   "configurations": [
-    {
-      "name": "Wails: Production edicode",
-      "type": "go",
-      "request": "launch",
-      "mode": "exec",
-      "program": "${workspaceFolder}/build/edicode",
-      "preLaunchTask": "build",
-      "cwd": "${workspaceFolder}"
-    },
-    {
-      "name": "Wails: Debug edicode",
-      "type": "go",
-      "request": "launch",
-      "mode": "exec",
-      "program": "${workspaceFolder}/build/edicode",
-      "preLaunchTask": "build debug",
-      "cwd": "${workspaceFolder}",
-      "env": {
-        "PROD": "FALSE",
-      }
-    },
-    {
-      "name": "Wails: Dev edicode",
-      "type": "go",
-      "request": "launch",
-      "mode": "exec",
-      "program": "${workspaceFolder}/build/edicode",
-      "preLaunchTask": "build dev",
-      "cwd": "${workspaceFolder}"
-    },
+    // {
+    //   "name": "Wails: Production edicode",
+    //   "type": "go",
+    //   "request": "launch",
+    //   "mode": "exec",
+    //   "program": "${workspaceFolder}/build/edicode",
+    //   "preLaunchTask": "build",
+    //   "cwd": "${workspaceFolder}"
+    // },
+    // {
+    //   "name": "Wails: Debug edicode",
+    //   "type": "go",
+    //   "request": "launch",
+    //   "mode": "exec",
+    //   "program": "${workspaceFolder}/build/edicode",
+    //   "preLaunchTask": "build debug",
+    //   "cwd": "${workspaceFolder}",
+    //   "env": {
+    //     "PROD": "FALSE",
+    //   }
+    // },
+    // {
+    //   "name": "Wails: Dev edicode",
+    //   "type": "go",
+    //   "request": "launch",
+    //   "mode": "exec",
+    //   "program": "${workspaceFolder}/build/edicode",
+    //   "preLaunchTask": "build dev",
+    //   "cwd": "${workspaceFolder}"
+    // },
     {
       "name": "Wails: Debug with front build",
       "type": "go",
