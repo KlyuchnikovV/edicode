@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { EventsOn, EventsEmit } from "../../wailsjs/runtime/runtime";
     import Button from "./button.svelte";
     import Codearea from "../codearea/codearea.svelte";
-    import { GetBufferNames } from "../../wailsjs/go/api/Api.js";
     import { onMount } from "svelte";
+    import { GetBufferNames } from "../../wailsjs/go/api/Api.js";
+    import { EventsOn, EventsEmit } from "../../wailsjs/runtime/runtime";
 
     export let config = {
         header: {
@@ -82,7 +82,6 @@
     }
 
     .child {
-        overflow-y: auto;
         height: 100%;
     }
 
@@ -107,7 +106,6 @@
         user-select: none;
         top: 0; /* Stay at the top */
         z-index: 1; /* Stay on top */
-        /* overflow-x: auto; */
         overflow: hidden;
         position: absolute;
     }

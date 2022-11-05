@@ -20,6 +20,7 @@
     let minimalHeight = parseInt(config.height.min, 10);
 
     let isToggled = true;
+    let collapsed = false;
 
     // The current position of mouse
     let x = 0;
@@ -40,11 +41,13 @@
             case "right":
                 x = e.clientX;
                 w = parseInt(styles.width, 10);
+                document.body.style.cursor = "col-resize";
                 break;
             case "top":
             case "bottom":
                 y = e.clientY;
                 h = parseInt(styles.height, 10);
+                document.body.style.cursor = "row-resize";
                 break;
         }
 
@@ -65,6 +68,7 @@
                 } else {
                     element.style.width = config.width.collapsed;
                 }
+                collapsed = element.style.width === config.width.collapsed;
                 break;
             case "right":
                 if (w + dx > minimalWidth) {
@@ -72,6 +76,7 @@
                 } else {
                     element.style.width = config.width.collapsed;
                 }
+                collapsed = element.style.width === config.width.collapsed;
                 break;
             case "top":
                 if (h - dy > minimalHeight) {
@@ -79,6 +84,7 @@
                 } else {
                     element.style.height = config.height.collapsed;
                 }
+                collapsed = element.style.height === config.height.collapsed;
                 break;
             case "bottom":
                 if (h + dy > minimalHeight) {
@@ -86,6 +92,7 @@
                 } else {
                     element.style.height = config.height.collapsed;
                 }
+                collapsed = element.style.height === config.height.collapsed;
                 break;
         }
     };
@@ -94,11 +101,24 @@
         // Remove the handlers of `mousemove` and `mouseup`
         document.removeEventListener("mousemove", mouseMoveHandler);
         document.removeEventListener("mouseup", mouseUpHandler);
+
+        document.body.style.cursor = "default";
     };
 
     onMount(() => {
         element.style.width = config.width.initial;
         element.style.height = config.height.initial;
+
+        switch (config.position) {
+            case "left":
+            case "right":
+                collapsed = element.style.width === config.width.collapsed;
+                break;
+            case "top":
+            case "bottom":
+                collapsed = element.style.height === config.height.collapsed;
+                break;
+        }
     });
 
     function togglePanel() {
@@ -125,89 +145,68 @@
     }
 </script>
 
-<div bind:this={element} class="resizable">
+<div bind:this={element} class="resizable" class:collapsed>
     <slot toggle={togglePanel} />
-    <div
-        class={`resizer resizer-${config.position}  ${config.position}`}
-        on:mousedown={mouseDownHandler}
-    />
+    <div class={`resizer ${config.position}`} on:mousedown={mouseDownHandler} />
 </div>
 
 <style>
-    ::-webkit-scrollbar {
-        width: 0;
-    }
-
-    .collapsed {
-        border: none;
-    }
-
-    .visible {
-        display: block;
-        /* visibility: visible; */
-    }
-
-    .not-visible {
-        display: none;
-        /* visibility: hidden;
-        max-height: 0px;
-        max-width: 0px; */
-    }
-
     .resizable {
         position: relative;
         height: 100%;
-        /* overflow: scroll; */
     }
 
-    .resizer {
-        /* All resizers are positioned absolutely inside the element */
+    .resizer.top,
+    .resizer.bottom {
         position: absolute;
-        z-index: 999999;
-    }
-
-    /* Placed at the right side */
-    .resizer-left,
-    .resizer-right {
-        width: 5px;
-        z-index: 10;
-    }
-
-    .resizer-top,
-    .resizer-bottom {
+        cursor: row-resize;
         height: 5px;
+        width: 100%;
+        left: 0;
         z-index: 10;
     }
 
-    .left {
+    .resizer.left,
+    .resizer.right {
+        position: absolute;
         cursor: col-resize;
         height: 100%;
-        left: -5px;
+        width: 5px;
         top: 0;
-    }
-
-    .right {
-        cursor: col-resize;
-        height: 100%;
-        right: -5px;
-        top: 0;
+        z-index: 10;
     }
 
     .top {
-        cursor: row-resize;
-        width: 100%;
-        left: 0;
         top: -5px;
     }
-
+    .left {
+        left: -5px;
+    }
+    .right {
+        right: -5px;
+    }
     .bottom {
-        cursor: row-resize;
-        width: 100%;
-        left: 0;
         bottom: -5px;
+    }
+
+    .collapsed > .top {
+        cursor: n-resize;
+    }
+    .collapsed > .left {
+        cursor: w-resize;
+    }
+    .collapsed > .right {
+        cursor: e-resize;
+    }
+    .collapsed > .bottom {
+        cursor: s-resize;
     }
 
     :hover.resizer {
         background-color: darkslategrey;
+    }
+
+    ::-webkit-scrollbar {
+        width: 0;
     }
 </style>

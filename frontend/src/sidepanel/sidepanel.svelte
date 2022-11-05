@@ -32,11 +32,7 @@
             }
         };
     }
-
-    function isVisible(buffer: string) {
-        return selected === buffer ? "visible" : "not-visible";
-    }
-
+    
     EventsOn("sidepanel_open", (name: any) => {
         console.log(`selected is ${selected}, name is ${name.data}`);
         selected = name.data;

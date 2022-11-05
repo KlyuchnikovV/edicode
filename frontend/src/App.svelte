@@ -1,8 +1,7 @@
 <script lang="ts">
 	import "@fortawesome/fontawesome-free/css/all.css";
-	import { onMount } from "svelte";
 	import { EventsOn } from "../wailsjs/runtime/runtime";
-	import { GetBufferNames, GetRightPanels } from "../wailsjs/go/api/Api.js";
+	import { GetRightPanels } from "../wailsjs/go/api/Api.js";
 	import Tabs from "./tabs/tabs.svelte";
 	import Flex from "./flex/flex.svelte";
 	import LazyLoader from "./lazy-loader/lazy-loader.svelte";
@@ -13,7 +12,6 @@
 	let hasRight = true;
 	let hasFooter = true;
 
-	// let buffers = [];
 	let plugins = [];
 	let items = [
 		{
@@ -25,17 +23,6 @@
 		},
 	];
 
-	// onMount(async () => {
-	// 	buffers = await GetBufferNames();
-	// 	console.log(plugins);
-	// });
-
-	// EventsOn(`buffer_opened`, async () => {
-	// 	buffers = await GetBufferNames();
-	// });
-	// EventsOn(`buffer_closed`, async () => {
-	// 	buffers = await GetBufferNames();
-	// });
 	EventsOn(`plugins_loaded_all`, async () => {
 		console.log("plugins all loaded");
 		plugins = await GetRightPanels();
@@ -85,6 +72,8 @@
 		height: 100%;
 		display: flex;
 		flex-direction: column;
+		user-select: none;
+		-webkit-user-select: none;
 	}
 
 	h2 {
@@ -93,37 +82,20 @@
 
 		font-size: 20px;
 		margin: 0;
-		/* user-select: none;
-		-webkit-user-select: none; */
 	}
 
-	/* div {
-		user-select: none;
-		-webkit-user-select: none;
-	} */
-	/*
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
-	} */
-
 	.left {
-		/* background-color: blue; */
 		width: 100%;
 		height: 100%;
 		user-select: none;
 	}
 
 	.center {
-		/* background-color: green; */
 		width: 100%;
 		height: 100%;
-		/* user-select: none; */
 	}
 
 	.right-panel {
-		/* background-color: yellow; */
 		width: 100%;
 		overflow: hidden;
 		user-select: none;
@@ -147,7 +119,6 @@
 
 	.footer {
 		bottom: 0;
-		/* background-color: black; */
 		width: 100%;
 	}
 
@@ -162,7 +133,6 @@
 	:global(::-webkit-scrollbar-thumb) {
 		background-color: #504e56; /* цвет бегунка */
 		border-radius: 3px; /* округлось бегунка */
-		/* border: 3px solid; отступ вокруг бегунка */
 	}
 
 	:global(::-webkit-scrollbar-corner) {

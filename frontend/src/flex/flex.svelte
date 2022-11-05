@@ -19,8 +19,8 @@
 					},
 					width: {
 						min: "50px",
-						initial: "0",
-						collapsed: "0",
+						initial: "0px",
+						collapsed: "0px",
 					},
 				}}
 			>
@@ -79,24 +79,12 @@
 			</Resizable>
 		</div>
 	</div>
-
-	<!-- <footer style="display:{hasFooter ? 'flex' : 'none'}"> -->
-	<!-- <Resizable position="top" width="350px" minWidth="150px" let:toggle>
-		<slot name="footer" />
-	</Resizable> -->
-	<!-- <slot name="footer" /> -->
-	<!-- </footer> -->
 </div>
 
 <style>
 	.flexbox {
 		height: 100%;
 		width: 100%;
-		/* border: solid 1px black; */
-		/* display: flex; */
-		/* flex-direction: column;
-		align-items: stretch; */
-
 		border-bottom: solid 1px black;
 	}
 
@@ -105,16 +93,9 @@
 		flex-direction: row;
 		height: 100%;
 		width: 100%;
-		/* user-select: none;
-		-webkit-user-select: none; */
 		position: relative;
 		overflow: hidden;
 		max-width: none;
-	}
-
-	div > div > :not(.center) {
-		/* border-top: none; */
-		/* border: solid 1px black; */
 	}
 
 	.right {
@@ -122,8 +103,6 @@
 		user-select: none;
 		-webkit-user-select: none;
 		height: 100%;
-		/* border-top: none; */
-		/* border-left: solid 1px black; */
 	}
 
 	.left {
@@ -132,17 +111,11 @@
 		-webkit-user-select: none;
 		height: 100%;
 		border-top: none;
-		/* border-right: solid 1px black; */
 	}
 
 	.center {
 		height: 100%;
-		/* width: 100%;
-		display: flex; */
-		/* user-select: none;
-		-webkit-user-select: none; */
 		overflow: hidden;
-		/* border-bottom: 1px solid black; */
 		flex-direction: column;
 		align-items: stretch;
 	}
@@ -156,12 +129,8 @@
 	}
 
 	.bottom {
-		/* footer { */
-		/* flex: 1; */
 		bottom: 0px;
 		user-select: none;
 		-webkit-user-select: none;
-		/* border-top: solid 1px black; */
-		/* height: 25px; */
 	}
 </style>

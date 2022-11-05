@@ -18,9 +18,9 @@
     let codearea;
 
     $: {
-        async()=> {
+        async () => {
             lines = (await GetBuffer(buffer)).lines;
-        }
+        };
     }
 
     onMount(async () => {
@@ -92,12 +92,12 @@
 
 <style>
     .codearea {
-        /* visibility: hidden; */
         display: flex;
-        /* height: 100%; */
-        /* overflow: scroll; */
+        height: 100%;
         user-select: none;
         -webkit-user-select: none;
+        overflow-y: scroll;
+        overflow-x: hidden;
     }
 
     .text-container {
@@ -107,13 +107,14 @@
         outline: none;
         user-select: none;
         -webkit-user-select: none;
-        /* resize: horizontal; */
         margin-left: 10px;
 
-        overflow: scroll;
+        overflow-y: hidden;
+        overflow-x: scroll;
     }
 
     .scrollpastend {
+        height: fit-content;
         padding-bottom: 87vh;
     }
 
@@ -121,8 +122,6 @@
         padding: 0 5px;
         box-sizing: border-box;
         border-right: 1px black solid;
-        /* position: absolute; */
-        /* background-color: rgba(27, 38, 54, 1); */
     }
 
     .gutter-line {
@@ -134,7 +133,6 @@
         overflow: hidden;
         user-select: none;
         -webkit-user-select: none;
-        /* border-bottom: 1px white solid; */
     }
 
     :global(code, div.line) {
