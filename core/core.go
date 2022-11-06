@@ -2,7 +2,7 @@ package core
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 
@@ -31,23 +31,16 @@ func New(paths ...string) (*Core, error) {
 	var (
 		core = Core{
 			buffers: make(map[string]*buffer.Buffer, len(paths)),
+			paths:   paths,
 		}
 		err error
 	)
-
-	// core.Context = *context.New(ctx, core.Init)
-	// core.watcher, err = watcher.New(ctx, &core, paths...)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	core.paths = paths
 
 	core.Manager, err = plugins.New(&core, "./configs/config.json")
 	if err != nil {
 		return nil, err
 	}
 
-	// core.On("buffer", "changed", core.on("buffer_changed", core.OnBufferChange))
 	return &core, nil
 }
 
@@ -110,7 +103,7 @@ func (core *Core) OpenFile(path string) error {
 		return err
 	}
 
-	bytes, err := ioutil.ReadAll(file)
+	bytes, err := io.ReadAll(file)
 	if err != nil {
 		return err
 	}
@@ -135,12 +128,4 @@ func (core *Core) CloseFile(path string) error {
 func (core *Core) ReloadFile(path string) error {
 	core.Emit("buffer", "changed", path)
 	return nil
-}
-
-func (core *Core) GetFileNames(path string) ([]string, error) {
-	panic("implement me")
-}
-
-func (core *Core) GetPluginsPath() string {
-	return "./plugins"
 }

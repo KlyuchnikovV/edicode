@@ -17,8 +17,6 @@
     "@tsconfig/svelte": "^3.0.0",
     "autoprefixer": "^10.4.7",
     "classnames": "^2.3.1",
-    "flowbite": "^1.5.3",
-    "flowbite-svelte": "^0.26.16",
     "node-sass": "^7.0.1",
     "postcss": "^8.4.14",
     "postcss-load-config": "^4.0.1",
@@ -28,7 +26,6 @@
     "svelte-grid": "^5.1.1",
     "svelte-preprocess": "^4.10.7",
     "svelte-tabs": "^1.1.0",
-    "tailwindcss": "^3.1.5",
     "tslib": "^2.4.0",
     "typescript": "^4.8.4",
     "vite": "^3.0.0"

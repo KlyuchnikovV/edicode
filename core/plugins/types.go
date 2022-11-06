@@ -24,8 +24,8 @@ type Context interface {
 	LengthOfBuffer(buffer string) (int, error)
 	GetCursor(buffer string) (*types.GetCaretResponse, error)
 	SaveBuffer(name string) error
-	GetFileNames(string) ([]string, error)
-	GetPluginsPath() string
+	// GetFileNames(string) ([]string, error)
+	// GetPluginsPath() string
 	// Events
 	On(object, action string, handler func(...interface{}))
 	Emit(object, action string, data interface{})

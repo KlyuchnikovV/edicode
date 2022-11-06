@@ -1,12 +1,12 @@
 <script lang="ts">
 	import "@fortawesome/fontawesome-free/css/all.css";
-	import { EventsOn } from "../wailsjs/runtime/runtime";
-	import { GetRightPanels } from "../wailsjs/go/api/Api.js";
 	import Tabs from "./tabs/tabs.svelte";
 	import Flex from "./flex/flex.svelte";
-	import LazyLoader from "./lazy-loader/lazy-loader.svelte";
-	import Sidepanel from "./sidepanel/sidepanel.svelte";
 	import Explorer from "./explorer/explorer.svelte";
+	import Sidepanel from "./sidepanel/sidepanel.svelte";
+	import LazyLoader from "./lazy-loader/lazy-loader.svelte";
+	import { EventsOn } from "../wailsjs/runtime/runtime";
+	import { GetRightPanels } from "../wailsjs/go/api/Api.js";
 
 	let hasLeft = true;
 	let hasRight = true;
