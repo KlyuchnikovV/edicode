@@ -1,20 +1,109 @@
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "Ui",
-            "type": "shell",
-            "command": "wails build -d",
-            "presentation": {
-                "echo": false,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": false,
-            },
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "npm install",
+      "type": "npm",
+      "script": "install",
+      "options": {
+        "cwd": "${workspaceFolder}/frontend",
+        "env": {
+          "CGO_CFLAGS": "-mmacosx-version-min=10.13",
+          "CGO_CXXFLAGS": "-I/Users/klyuchnikovv/go/src/github.com/KlyuchnikovV/edicode/build",
+          "CGO_ENABLED": "1",
+          "CGO_LDFLAGS": "-framework UniformTypeIdentifiers -mmacosx-version-min=10.13",
+          "GOOS": "darwin",
+          "GOARCH": "arm64"
         }
-    ]
+      },
+      "presentation": {
+        "clear": true,
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "npm run build",
+      "type": "npm",
+      "script": "build",
+      "options": {
+        "cwd": "${workspaceFolder}/frontend",
+        "env": {
+          "CGO_CFLAGS": "-mmacosx-version-min=10.13",
+          "CGO_CXXFLAGS": "-I/Users/klyuchnikovv/go/src/github.com/KlyuchnikovV/edicode/build",
+          "CGO_ENABLED": "1",
+          "CGO_LDFLAGS": "-framework UniformTypeIdentifiers -mmacosx-version-min=10.13",
+          "GOOS": "darwin",
+          "GOARCH": "arm64"
+        }
+      },
+      "presentation": {
+        "clear": true,
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "build",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "CGO_CFLAGS": "-mmacosx-version-min=10.13",
+          "CGO_CXXFLAGS": "-I/Users/klyuchnikovv/go/src/github.com/KlyuchnikovV/edicode/build",
+          "CGO_ENABLED": "1",
+          "CGO_LDFLAGS": "-framework UniformTypeIdentifiers -mmacosx-version-min=10.13",
+          "GOOS": "darwin",
+          "GOARCH": "arm64"
+        }
+      },
+      "command": "go1.19.3 build -tags dev -gcflags \"all=-N -l\" -o=build/edicode",
+      "dependsOn": [
+        "npm run build"
+      ],
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "rebuild",
+      "type": "shell",
+      "command": "wails",
+      "args": [
+        "dev",
+        "-v=2",
+        "-loglevel=Debug"
+      ],
+      "problemMatcher": [],
+      "group": "build"
+    },
+        {
+          "label": "build only back",
+          "type": "shell",
+          "options": {
+            "cwd": "${workspaceFolder}",
+            "env": {
+              "CGO_CFLAGS": "-mmacosx-version-min=10.13",
+              "CGO_CXXFLAGS": "-I/Users/klyuchnikovv/go/src/github.com/KlyuchnikovV/edicode/build",
+              "CGO_ENABLED": "1",
+              "CGO_LDFLAGS": "-framework UniformTypeIdentifiers -mmacosx-version-min=10.13",
+              "GOOS": "darwin",
+              "GOARCH": "arm64"
+            }
+          },
+          "command": "go1.19.3 build -tags dev -gcflags \"all=-N -l\" -o=build/edicode",
+          "dependsOn": [
+            // "npm run build"
+          ],
+          "problemMatcher": [],
+          "group": {
+            "kind": "build",
+            "isDefault": true
+          }
+        },
+  ]
 }

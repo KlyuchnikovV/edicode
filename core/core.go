@@ -1,106 +1,74 @@
 package core
 
 import (
-	ctx "context"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 
-	"github.com/KlyuchnikovV/buffer"
+	goContext "context"
+
 	"github.com/KlyuchnikovV/edicode/core/context"
-	"github.com/KlyuchnikovV/edicode/core/plugin"
+	"github.com/KlyuchnikovV/edicode/core/plugins"
+	"github.com/KlyuchnikovV/edicode/core/watcher"
+	buffer "github.com/KlyuchnikovV/simple_buffer"
 	"github.com/mitchellh/mapstructure"
-	"github.com/wailsapp/wails"
 )
-
-/* TODO:
-- delete, copy, paste selection
-- undo, redo
--
-
-*/
 
 type Core struct {
 	context.Context
 
 	buffers map[string]*buffer.Buffer
 
-	plugins []plugin.Plugin
+	*plugins.Manager
+
+	watcher *watcher.Watcher
+
+	paths []string
 }
 
-func New(ctx ctx.Context, paths ...string) (*Core, error) {
-	var core = Core{
-		buffers: make(map[string]*buffer.Buffer, len(paths)),
-	}
-	core.Context = *context.New(ctx, core.Init)
-
-	for _, path := range paths {
-		file, err := os.Open(path)
-		if err != nil {
-			return nil, err
+func New(paths ...string) (*Core, error) {
+	var (
+		core = Core{
+			buffers: make(map[string]*buffer.Buffer, len(paths)),
 		}
-		bytes, err := ioutil.ReadAll(file)
-		if err != nil {
-			return nil, err
-		}
+		err error
+	)
 
-		core.buffers[path] = buffer.New(ctx, path, bytes...)
-	}
-
-	// p, err := plugin.New(
-	// 	&core,
-	// 	fmt.Sprintf("highlighter_%s", "go"),
-	// 	"../highlight/build/highlight.so",
-	// )
+	// core.Context = *context.New(ctx, core.Init)
+	// core.watcher, err = watcher.New(ctx, &core, paths...)
 	// if err != nil {
 	// 	return nil, err
 	// }
+	core.paths = paths
 
-	// core.plugins = []plugin.Plugin{}
+	core.Manager, err = plugins.New(&core, "./configs/config.json")
+	if err != nil {
+		return nil, err
+	}
 
+	// core.On("buffer", "changed", core.on("buffer_changed", core.OnBufferChange))
 	return &core, nil
 }
 
-func (core *Core) Init() {
-	core.On("buffer", "changed", core.on("buffer_changed", core.OnBufferChange))
-}
+func (core *Core) Init(ctx goContext.Context) {
+	var err error
 
-func (core *Core) Bind(app *wails.App) {
-	app.Bind(&core.Context)
-
-	for _, buf := range core.Buffers() {
-		app.Bind(buf)
+	core.Context = *context.New(ctx, nil)
+	core.watcher, err = watcher.New(ctx, core, core.paths...)
+	if err != nil {
+		panic(err)
 	}
 
-	for _, pl := range core.plugins {
-		app.Bind(&pl)
+	if err := core.Manager.LoadPlugins(); err != nil {
+		panic(err)
 	}
 }
 
-func (core *Core) Start() error {
-	for _, buf := range core.buffers {
-		if err := buf.Start(); err != nil {
-			return nil
-		}
-	}
-
-	return nil
-}
-
-func (core *Core) Cancel() error {
-	for _, buf := range core.buffers {
-		if err := buf.Cancel(); err != nil {
-			return nil
-		}
-	}
-
-	return nil
-}
-
-func (core *Core) on(eventName string, handler plugin.On) func(...interface{}) {
+func (core *Core) on(eventName string, handler plugins.On) func(...interface{}) {
 	return func(args ...interface{}) {
 		log.Printf("PLUGIN: event %s, args %#v", eventName, args)
-		var event plugin.Event
+		var event plugins.Event
 		if len(args) == 0 {
 			panic("args is zero") // TODO: errors channel in 'p'
 		}
@@ -121,7 +89,7 @@ func (core *Core) on(eventName string, handler plugin.On) func(...interface{}) {
 			}
 		}
 
-		event = plugin.BufferChangeEvent{
+		event = plugins.BufferChangeEvent{
 			Buffer:    data.Data.(string),
 			Timestamp: data.Timestamp,
 		}
@@ -129,4 +97,50 @@ func (core *Core) on(eventName string, handler plugin.On) func(...interface{}) {
 			panic(err) // TODO: errors channel in 'p'
 		}
 	}
+}
+
+func (core *Core) OpenFile(path string) error {
+	if _, ok := core.buffers[path]; ok {
+		core.Emit("buffer", "opened", path)
+		return nil
+	}
+
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+
+	bytes, err := ioutil.ReadAll(file)
+	if err != nil {
+		return err
+	}
+
+	core.buffers[path] = buffer.NewFromBytes(core.Context, path, bytes...)
+	core.Emit("buffer", "opened", path)
+
+	return nil
+}
+
+func (core *Core) CloseFile(path string) error {
+	if _, ok := core.buffers[path]; !ok {
+		return fmt.Errorf("buffer not found")
+	}
+
+	delete(core.buffers, path)
+	core.Emit("buffer", "closed", path)
+
+	return nil
+}
+
+func (core *Core) ReloadFile(path string) error {
+	core.Emit("buffer", "changed", path)
+	return nil
+}
+
+func (core *Core) GetFileNames(path string) ([]string, error) {
+	panic("implement me")
+}
+
+func (core *Core) GetPluginsPath() string {
+	return "./plugins"
 }

@@ -6,33 +6,21 @@ import (
 	"log"
 	"time"
 
-	"github.com/wailsapp/wails"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type Context struct {
-	ctx    context.Context
+	context.Context
 	cancel context.CancelFunc
-
-	runtime *wails.Runtime
 
 	init func()
 }
 
 func New(ctx context.Context, init func()) *Context {
 	return &Context{
-		ctx:  ctx,
-		init: init,
+		Context: ctx,
+		init:    init,
 	}
-}
-
-func (ctx *Context) WailsInit(runtime *wails.Runtime) error {
-	ctx.runtime = runtime
-
-	if ctx.init != nil {
-		ctx.init()
-	}
-
-	return nil
 }
 
 func (ctx *Context) Start() error {
@@ -40,7 +28,7 @@ func (ctx *Context) Start() error {
 		return fmt.Errorf("already started")
 	}
 
-	ctx.ctx, ctx.cancel = context.WithCancel(ctx.ctx)
+	ctx.Context, ctx.cancel = context.WithCancel(ctx.Context)
 
 	return nil
 }
@@ -57,7 +45,7 @@ func (ctx *Context) Cancel() error {
 }
 
 func (ctx *Context) On(object, action string, handler func(...interface{})) {
-	ctx.runtime.Events.On(object+"_"+action, handler)
+	runtime.EventsOn(ctx.Context, object+"_"+action, handler)
 }
 
 func (ctx *Context) Emit(object, action string, data interface{}) {
@@ -66,14 +54,11 @@ func (ctx *Context) Emit(object, action string, data interface{}) {
 
 func (ctx *Context) EmitTimed(object, action string, timestamp int64, data interface{}) {
 	log.Printf("HIGHLIGHT: %s changed %#v", object+"_"+action, data)
-	ctx.runtime.Events.Emit(object+"_"+action, DataWithTime{
+
+	runtime.EventsEmit(ctx.Context, object+"_"+action, DataWithTime{
 		Data:      data,
 		Timestamp: timestamp,
 	})
-}
-
-func (ctx *Context) Done() <-chan struct{} {
-	return ctx.ctx.Done()
 }
 
 type DataWithTime struct {
@@ -81,8 +66,8 @@ type DataWithTime struct {
 	Timestamp int64       `json:"timestamp"`
 }
 
-func (ctx *Context) OnInit(object string, f func(...interface{})) {
-	ctx.runtime.Events.Once(object+"_init", func(optionalData ...interface{}) {
-		f(optionalData...)
-	})
-}
+// func (ctx *Context) OnInit(object string, f func(...interface{})) {
+// 	ctx.runtime.Events.Once(object+"_init", func(optionalData ...interface{}) {
+// 		f(optionalData...)
+// 	})
+// }

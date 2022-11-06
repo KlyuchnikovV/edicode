@@ -8,10 +8,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/KlyuchnikovV/buffer"
-	"github.com/KlyuchnikovV/edicode/core/plugin"
+	"github.com/KlyuchnikovV/edicode/core/plugins"
 	"github.com/KlyuchnikovV/edicode/core/syntax"
 	"github.com/KlyuchnikovV/edicode/types"
+	buffer "github.com/KlyuchnikovV/simple_buffer"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 func (core *Core) GetBuffer(name string) (*types.BufferData, error) {
@@ -20,12 +21,7 @@ func (core *Core) GetBuffer(name string) (*types.BufferData, error) {
 		return nil, fmt.Errorf("buffer '%s' not found", name)
 	}
 
-	lines, err := buf.GetLines()
-	if err != nil {
-		return nil, err
-	}
-
-	result, err := syntax.New().Tokenize(strings.Join(lines, "\n"))
+	result, err := syntax.New().TokenizeLines(buf.String())
 	if err != nil {
 		return nil, err
 	}
@@ -37,35 +33,13 @@ func (core *Core) GetBuffer(name string) (*types.BufferData, error) {
 	}, nil
 }
 
-func (core *Core) HandleKeyboardEvent(event types.KeyboardEvent) error {
-	buf, ok := core.buffers[event.Buffer]
+func (core *Core) HandleKeyboardEvent(event buffer.KeyboardEvent) error {
+	buffer, ok := core.buffers[event.Buffer]
 	if !ok {
 		return fmt.Errorf("buf '%s' not found", event.Buffer)
 	}
 
-	switch {
-	case event.Key == "Backspace":
-		log.Printf("HANDLE: backspace event is %#v", event)
-		buf.KeyboardEvents() <- event
-	case event.Key == "ArrowLeft":
-		buf.KeyboardEvents() <- event
-	case event.Key == "ArrowRight":
-		buf.KeyboardEvents() <- event
-	case event.Key == "ArrowUp":
-		buf.KeyboardEvents() <- event
-	case event.Key == "ArrowDown":
-		buf.KeyboardEvents() <- event
-	case event.Key == "Enter":
-		buf.KeyboardEvents() <- event
-	case event.Key == "Escape":
-		log.Printf("EXITING")
-		os.Exit(0)
-	case len(event.Key) == 1:
-		log.Printf("HANDLE: event is %#v", event)
-		buf.KeyboardEvents() <- event
-	case event.Key == "Tab":
-		buf.KeyboardEvents() <- event
-	}
+	buffer.KeyEvents <- event
 
 	return nil
 }
@@ -82,6 +56,10 @@ func (core *Core) GetBufferNames() []string {
 
 	sort.Slice(result, func(i, j int) bool {
 		for k := 0; k < len(result[i]); k++ {
+			if core.buffers[result[i]].ModifiedAt != core.buffers[result[j]].ModifiedAt {
+				return core.buffers[result[i]].ModifiedAt < core.buffers[result[j]].ModifiedAt
+			}
+
 			if k >= len(result[j]) {
 				return false
 			}
@@ -96,9 +74,9 @@ func (core *Core) GetBufferNames() []string {
 	return result
 }
 
-func (core *Core) OnBufferChange(event plugin.Event) error {
+func (core *Core) OnBufferChange(event plugins.Event) error {
 	log.Printf("HIGHLIGHT: got event %#v", event)
-	buffer, err := core.GetBuffer(event.(plugin.BufferChangeEvent).Buffer)
+	buffer, err := core.GetBuffer(event.(plugins.BufferChangeEvent).Buffer)
 	if err != nil {
 		return err
 	}
@@ -112,7 +90,125 @@ func (core *Core) OnBufferChange(event plugin.Event) error {
 	// TODO: highlight
 
 	// send data to backdrop
-	core.EmitTimed("highlight", "changed", buffer.Timestamp, buffer)
+	core.EmitTimed("highlight_changed", buffer.Buffer, buffer.Timestamp, buffer)
 
 	return nil
+}
+
+func (core *Core) LengthOfLine(request types.GetLineLengthRequest) (int, error) {
+	buf, ok := core.buffers[request.Buffer]
+	if !ok {
+		return -1, fmt.Errorf("buf '%s' not found", request.Buffer)
+	}
+
+	return buf.LengthOfLine(request.Line)
+}
+
+func (core *Core) LengthOfBuffer(buffer string) (int, error) {
+	buf, ok := core.buffers[buffer]
+	if !ok {
+		return -1, fmt.Errorf("buf '%s' not found", buffer)
+	}
+
+	return len(buf.String()), nil
+}
+
+func (core *Core) GetCursor(buffer string) (*types.GetCaretResponse, error) {
+	buf, ok := core.buffers[buffer]
+	if !ok {
+		return nil, fmt.Errorf("buf '%s' not found", buffer)
+	}
+
+	start, end := buf.GetSelection()
+	return &types.GetCaretResponse{
+		Start: start,
+		End:   end,
+	}, nil
+}
+
+func (core *Core) SetCursor(event types.CaretMovedEvent) (*types.GetCaretResponse, error) {
+	buf, ok := core.buffers[event.Buffer]
+	if !ok {
+		return nil, fmt.Errorf("buf '%s' not found", event.Buffer)
+	}
+
+	buf.SetStartAndEnd(event.Start, event.End)
+
+	start, end := buf.GetSelection()
+	core.Emit("cursor_moved", event.Buffer, types.GetCaretResponse{
+		Buffer: event.Buffer,
+		Start:  start,
+		End:    end,
+	})
+
+	return core.GetCursor(event.Buffer)
+}
+
+func (core *Core) MouseUp(event types.MouseEvent) error {
+	buf, ok := core.buffers[event.Buffer]
+	if !ok {
+		return fmt.Errorf("buf '%s' not found", event.Buffer)
+	}
+
+	buf.SetEnd(event.Line, event.Offset)
+
+	return nil
+}
+
+func (core *Core) MouseDown(event types.MouseEvent) error {
+	buf, ok := core.buffers[event.Buffer]
+	if !ok {
+		return fmt.Errorf("buf '%s' not found", event.Buffer)
+	}
+
+	buf.SetStart(event.Line, event.Offset)
+
+	fmt.Println(event)
+	return nil
+}
+
+func (core *Core) SaveBuffer(name string) error {
+	buf, ok := core.buffers[name]
+	if !ok {
+		return fmt.Errorf("buf '%s' not found", name)
+	}
+
+	file, err := os.OpenFile(buf.Name(), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
+	if err != nil {
+		return err
+	}
+
+	_, err = file.WriteAt([]byte(buf.String()), 0)
+	return err
+}
+
+func (core *Core) GetActionsList(filterBy string) []plugins.Action {
+	var result = make([]plugins.Action, 0)
+
+	for _, plug := range core.Manager.Plugins() {
+		if plug.Actions == nil {
+			continue
+		}
+
+		for name := range plug.Actions() {
+			result = append(result, plugins.Action{
+				Name:   fmt.Sprintf("%s: %s", plug.Config.Name, name),
+				Action: fmt.Sprintf("%s.%s", strings.ToLower(plug.Config.Name), name),
+			})
+		}
+	}
+
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].Name < result[j].Name
+	})
+
+	return result
+}
+
+func (core *Core) OpenDirectoryDialog(options runtime.OpenDialogOptions) (string, error) {
+	return runtime.OpenDirectoryDialog(core.Context, options)
+}
+
+func (core *Core) OpenFileDialog(options runtime.OpenDialogOptions) (string, error) {
+	return runtime.OpenFileDialog(core.Context, options)
 }

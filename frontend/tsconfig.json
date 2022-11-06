@@ -1,0 +1,21 @@
+{
+    "extends": "@tsconfig/svelte/tsconfig.json",
+    "include": [
+        "src/**/*",
+        "../plugins/**/*",
+    ],
+    "exclude": [
+        "node_modules/*",
+        "dist/*"
+    ],
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@/*": [
+                "./src/*",
+                "./dist/*",
+                "../plugins/*",
+            ]
+        },
+    },
+}

@@ -1,47 +1,56 @@
 package main
 
 import (
-	_ "embed"
+	"embed"
 
 	"github.com/KlyuchnikovV/edicode/api"
 	"github.com/KlyuchnikovV/edicode/core"
-	"github.com/wailsapp/wails"
+	"github.com/wailsapp/wails/v2/pkg/application"
+	"github.com/wailsapp/wails/v2/pkg/options"
 	"golang.org/x/net/context"
 )
 
-//go:embed ui/public/build/bundle.js
-var js string
-
-//go:embed ui/public/index.html
-var html string
-
-//go:embed ui/public/build/bundle.css
-var css string
+//go:embed frontend/dist
+var assets embed.FS
 
 func main() {
-	app := wails.CreateApp(&wails.AppConfig{
-		Width:  1000,
-		Height: 700,
-		Title:  "edicode",
-		JS:     js,
-		CSS:    css,
-		HTML:   html,
-		Colour: "#FFFFFF",
-	})
-
-	c, err := core.New(context.Background(), "main.go", "main_test.go")
+	var api = api.New()
+	c, err := core.New("main.go")
 	if err != nil {
 		panic(err)
 	}
 
-	a := api.New(c)
-	a.Bind(app)
+	api.Bind(c)
 
-	if err := c.Start(); err != nil {
+	// var binds = []interface{}{
+	// 	api,
+	// 	&plugins.Plugin{},
+	// }
+
+	// for _, bind := range c.Manager.Plugins() {
+	// 	binds = append(binds, bind)
+	// }
+
+	mainApp := application.NewWithOptions(&options.App{
+		Width:            1000,
+		Height:           700,
+		Title:            "edicode",
+		Assets:           assets,
+		BackgroundColour: options.NewRGB(40, 44, 52),
+		OnStartup:        onStartup(c),
+		Bind: []interface{}{
+			api,
+			c.Manager,
+		},
+	})
+
+	if err := mainApp.Run(); err != nil {
 		panic(err)
 	}
+}
 
-	if err := app.Run(); err != nil {
-		panic(err)
+func onStartup(c *core.Core) func(ctx context.Context) {
+	return func(ctx context.Context) {
+		c.Init(ctx)
 	}
 }
